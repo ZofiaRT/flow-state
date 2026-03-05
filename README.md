@@ -32,7 +32,9 @@ The Problem: Windows PowerShell blocks npm scripts by default.
 The Fix:
 1. Open a new Windows PowerShell window as an Administrator (Search in the Start menu -> Right-click -> Run as Administrator).
 2. Paste this command and hit Enter:
+```
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
 3. Type Y to confirm.
 4. Restart VS Code completely and try pressing F5 again.
 
