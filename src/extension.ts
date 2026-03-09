@@ -1,26 +1,32 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { CognitiveLoadTracker } from './developerCognitiveLoad';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+    console.log('Flow-State extension is now active!');
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "flow-state" is now active!');
+    const loadTracker = new CognitiveLoadTracker();
+    
+    context.subscriptions.push(
+        loadTracker.statusBarItem,
+        vscode.workspace.onDidChangeTextDocument(e => loadTracker.onDocumentChanged(e)),
+        vscode.window.onDidChangeActiveTextEditor(e => loadTracker.onEditorChanged(e)),
+        vscode.window.onDidChangeTextEditorVisibleRanges(e => loadTracker.onScrolled(e))
+    );
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('flow-state.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Flow-State!');
-	});
+    // --- NEW: The Teleport Command triggered by clicking the popup links ---
+    const teleportCommand = vscode.commands.registerCommand('flow-state.teleport', async (args: { path: string, line: number }) => {
+        // Find the file and open it
+        const uri = vscode.Uri.file(args.path);
+        const doc = await vscode.workspace.openTextDocument(uri);
+        const editor = await vscode.window.showTextDocument(doc);
+        
+        // Jump directly to the bad line of code
+        const position = new vscode.Position(args.line - 1, 0);
+        editor.selection = new vscode.Selection(position, position);
+        editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
+    });
 
-	context.subscriptions.push(disposable);
+    context.subscriptions.push(teleportCommand);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
