@@ -109,7 +109,7 @@ export class CognitiveLoadTracker {
         for (let line of lines) {
             line = line.trim();
             // Ignore blank lines and simple single-line comments
-            if (line.startsWith('//') || line === '') continue;
+            if (line.startsWith('//') || line === '') { continue; }
 
             // --- Rule 2 & Rule 3 from the paper: Breaks in Linear Flow & Nesting Penalty ---
             // For each of these control structures, we add +1 for breaking the top-to-bottom 
