@@ -15,7 +15,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const WINDOW_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
 	const SWITCH_THRESHOLD = 8;           
-	const WARNING_COOLDOWN = 5 * 60 * 1000; // 5 minutes cooldown between warnings
+	const WARNING_COOLDOWN = 5 * 60 * 1000; // 5 minutes cooldown for snooze
+	const DISMISS_COOLDOWN = 1 * 60 * 1000;  // 1 min grace after Dismiss
 	let lastWarningTime = 0;  
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
@@ -42,10 +43,16 @@ export function activate(context: vscode.ExtensionContext) {
 		switchTimestamps = switchTimestamps.filter(t => now - t < WINDOW_DURATION);
 
 		if (switchTimestamps.length >= SWITCH_THRESHOLD && now - lastWarningTime > WARNING_COOLDOWN) {
-			vscode.window.showInformationMessage(
-				"Frequent context switching detected in the last 10 minutes. Try focusing on one task."
-			);
-			lastWarningTime = now;
+			vscode.window.showWarningMessage(
+            `Frequent context switching detected! Try focusing on one task.`,
+            "Snooze"
+        	).then(selection => {
+				if (selection === "Snooze") {
+					lastWarningTime = now;
+				} else {
+					lastWarningTime = now - (WARNING_COOLDOWN - DISMISS_COOLDOWN);
+				}
+        	});
 		}
 
 		console.log("Context switches in last 10 min:", switchTimestamps.length);
@@ -59,21 +66,17 @@ export function activate(context: vscode.ExtensionContext) {
 		const folder = path.dirname(filePath);
 		const group = editor.viewColumn;
 
-		// Detect file switch
-		if (lastFile && filePath !== lastFile) {
-			console.log("File switch detected");
-			recordContextSwitch();
-		}
+		const switched = (
+			(lastFile && filePath !== lastFile) ||                       // Detect file switch
+			(lastFolder && folder !== lastFolder) ||                     // Detect folder/module switch
+			(lastEditorGroup !== undefined && group !== lastEditorGroup) // Detect editor group switch
+		);
 
-		// Detect folder/module switch
-		if (lastFolder && folder !== lastFolder) {
-			console.log("Folder/module switch detected");
-			recordContextSwitch();
-		}
-
-		// Detect editor group switch
-		if (lastEditorGroup !== undefined && group !== lastEditorGroup) {
-			console.log("Editor group switch detected");
+		if (switched) {
+			console.log(`Context switch detected: 
+				file changed? ${lastFile && filePath !== lastFile} 
+				folder changed? ${lastFolder && folder !== lastFolder} 
+				editor group changed? ${lastEditorGroup !== undefined && group !== lastEditorGroup}`);
 			recordContextSwitch();
 		}
 
