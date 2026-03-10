@@ -7,6 +7,7 @@ export class CognitiveLoadTracker {
     public totalTabSwitches = 0;
     public thrashingWarningsFired = 0;
     public struggleWarningsFired = 0;
+    public currentComplexityScore = 0;
 
     private charactersTyped = 0;
     private backspacesTyped = 0;
@@ -209,13 +210,14 @@ export class CognitiveLoadTracker {
             const editor = vscode.window.activeTextEditor;
             if (editor) {
                 const documentText = editor.document.getText();
-                const currentComplexityScore = this.calculateCognitiveComplexity(documentText);
+                this.currentComplexityScore = this.calculateCognitiveComplexity(documentText);
                 
-                // 15 is the official SonarQube threshold for "Too Complex"
-                if (currentComplexityScore > 15) {
+                if (this.currentComplexityScore > 15) {
                     isHighLoad = true;
-                    loadReason = `High Code Complexity (Score: ${currentComplexityScore})`;
+                    loadReason = `High Code Complexity (Score: ${this.currentComplexityScore})`;
                 }
+            } else {
+                this.currentComplexityScore = 0; // Reset if no file is open
             }
         }
 
@@ -241,6 +243,8 @@ export class CognitiveLoadTracker {
         tooltip.appendMarkdown(`* $(warning) Thrashing Warnings: **${this.thrashingWarningsFired}**\n`);
         tooltip.appendMarkdown(`* $(error) Struggle Warnings: **${this.struggleWarningsFired}**\n\n`);
         
+        tooltip.appendMarkdown(`---\n\n### 🧠 Code Complexity\n\n`);
+        tooltip.appendMarkdown(`* Current File Score: **${this.currentComplexityScore}** *(Threshold: 15)*\n\n`);
         tooltip.appendMarkdown(`---\n\n### ⚠️ Deep Nesting Hotspots\n\n`);
         
         if (this.nestingIncidents.length === 0) {
