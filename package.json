@@ -16,6 +16,10 @@
       {
         "command": "flow-state.helloWorld",
         "title": "Flow-State: Hello World"
+      },
+      {
+        "command": "flow-state.startPomodoro",
+        "title": "Start Pomodoro Timer"
       }
     ]
   },
