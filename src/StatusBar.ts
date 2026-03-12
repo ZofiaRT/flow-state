@@ -15,24 +15,18 @@ export class StatusBar {
         this.statusBarItem.dispose();
     }
 
-    public updateHoverPopup(
-        tabSwitches = 0, 
-        thrashingWarnings = 0, 
-        struggleWarnings = 0, 
-        complexityScore = 0
-    ) {
+    public updateHoverPopup() {
         const tooltip = new vscode.MarkdownString();
         tooltip.isTrusted = true;
 
         tooltip.appendMarkdown(`### Flow-State Session\n\n---\n\n`);
         tooltip.appendMarkdown(`**Focus Stats:**\n\n`);
-        tooltip.appendMarkdown(`* $(files) Tab Switches: **${tabSwitches}**\n`);
-        tooltip.appendMarkdown(`* $(warning) Thrashing Warnings: **${thrashingWarnings}**\n`);
-        tooltip.appendMarkdown(`* $(error) Struggle Warnings: **${struggleWarnings}**\n\n`);
+        tooltip.appendMarkdown(`* Tab Switches: **${0}**\n`);
+        tooltip.appendMarkdown(`* Thrashing Warnings: **${0}**\n`);
+        tooltip.appendMarkdown(`* Struggle Warnings: **${0}**\n\n`);
         
         tooltip.appendMarkdown(`---\n\n### Code Complexity\n\n`);
-        tooltip.appendMarkdown(`* Current File Score: **${complexityScore}** *(Threshold: 15)*\n\n`);
-        tooltip.appendMarkdown(`---\n\n### Deep Nesting Hotspots\n\n`);
+        tooltip.appendMarkdown(`* Current File Score: **${0}** *(Threshold: 15)*\n\n`);
 
         this.statusBarItem.tooltip = tooltip;
     }
