@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { StatusBar } from './StatusBar'
+import { checkZombiePackages } from './zombiePackages';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Congratulations, your extension "flow-state" is now active!');
@@ -10,10 +11,19 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage('Hello World from Flow-State!');
     });
 
+    const outputChannel = vscode.window.createOutputChannel('Flow-State');
+
+	const zombieDisposable = vscode.commands.registerCommand('flow-state.checkZombiePackages', () => {
+		checkZombiePackages(outputChannel);
+	});
+
     context.subscriptions.push(
         disposableCommand,
-        flowStateStatusBar 
+        flowStateStatusBar,
+        outputChannel,
+        zombieDisposable,
     );
 }
 
 export function deactivate() {}
+
