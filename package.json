@@ -2,6 +2,7 @@
   "name": "flow-state",
   "displayName": "Flow-State",
   "description": "Protects developers from burnout",
+  "publisher": "SSE Group 13",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.109.0"
@@ -20,6 +21,23 @@
       {
         "command": "flow-state.checkZombiePackages",
         "title": "Flow-State: Check Zombie Packages"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "flowState.welcome",
+        "title": "Welcome to Flow-State!",
+        "description": "Set up and customize Flow-State to protect yourself from burnout.",
+        "steps": [
+          {
+            "id": "flowState.statusBar",
+            "title": "Monitor Your Flow State",
+            "description": "The Status Bar at the bottom right is the heart of this extension. It actively monitors your session . \n\n**Hover over it** at any time to reveal detailed session stats, including the **Code Complexity** score of your current file!",
+            "media": {
+              "markdown": "walkthroughs/statusbar.md"
+            }
+          }
+        ]
       }
     ]
   },
