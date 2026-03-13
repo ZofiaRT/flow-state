@@ -20,11 +20,6 @@ export class StatusBar {
         tooltip.isTrusted = true;
 
         tooltip.appendMarkdown(`### Flow-State Session\n\n---\n\n`);
-        tooltip.appendMarkdown(`**Focus Stats:**\n\n`);
-        tooltip.appendMarkdown(`* Tab Switches: **${0}**\n`);
-        tooltip.appendMarkdown(`* Thrashing Warnings: **${0}**\n`);
-        tooltip.appendMarkdown(`* Struggle Warnings: **${0}**\n\n`);
-        
         tooltip.appendMarkdown(`---\n\n### Code Complexity\n\n`);
         tooltip.appendMarkdown(`* Current File Score: **${0}** *(Threshold: 15)*\n\n`);
 
