@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { CognitiveLoadTracker } from './developerCognitiveLoad';
+import { CognitiveLoadTracker } from './features/DeveloperCognitiveLoadTracker';
 import { StatusBar } from './StatusBar'
 import { checkZombiePackages } from './zombiePackages';
 
@@ -8,7 +8,9 @@ export function activate(context: vscode.ExtensionContext) {
 
     const flowStateStatusBar = new StatusBar();
 
-    const loadTracker = new CognitiveLoadTracker();
+    const developerCognitiveLoadTracker = new CognitiveLoadTracker(flowStateStatusBar);
+    const editorChangeDisposable = vscode.window.onDidChangeActiveTextEditor(e => developerCognitiveLoadTracker.onEditorChanged(e));
+    const documentChangeDisposable = vscode.workspace.onDidChangeTextDocument(e => developerCognitiveLoadTracker.onDocumentChanged(e));
 
     const disposableCommand = vscode.commands.registerCommand('flow-state.helloWorld', () => {
         vscode.window.showInformationMessage('Hello World from Flow-State!');
@@ -38,9 +40,8 @@ export function activate(context: vscode.ExtensionContext) {
         outputChannel,
         zombieDisposable,
         teleportCommand,
-        vscode.workspace.onDidChangeTextDocument(e => loadTracker.onDocumentChanged(e)),
-        vscode.window.onDidChangeActiveTextEditor(e => loadTracker.onEditorChanged(e)),
-        vscode.window.onDidChangeTextEditorVisibleRanges(e => loadTracker.onScrolled(e))
+        editorChangeDisposable,
+        documentChangeDisposable
     );
 }
 

@@ -21,7 +21,17 @@
         "command": "flow-state.checkZombiePackages",
         "title": "Flow-State: Check Zombie Packages"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Flow-State",
+      "properties": {
+        "flow-state.enableCognitiveComplexity": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Code Complexity tracking for developer cognitive load metric."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
