@@ -38,7 +38,6 @@ export function activate(context: vscode.ExtensionContext) {
         outputChannel,
         zombieDisposable,
         teleportCommand,
-        loadTracker.statusBarItem,
         vscode.workspace.onDidChangeTextDocument(e => loadTracker.onDocumentChanged(e)),
         vscode.window.onDidChangeActiveTextEditor(e => loadTracker.onEditorChanged(e)),
         vscode.window.onDidChangeTextEditorVisibleRanges(e => loadTracker.onScrolled(e))

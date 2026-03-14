@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 export class CognitiveLoadTracker {
-    public statusBarItem: vscode.StatusBarItem;
+    // public statusBarItem: vscode.StatusBarItem;
 
     public nestingIncidents: { file: string, uri: vscode.Uri, line: number, level: number, time: Date }[] = [];
     public totalTabSwitches = 0;
@@ -25,9 +25,9 @@ export class CognitiveLoadTracker {
     private readonly STRUGGLE_TIME_MS = 3 * 60 * 1000; 
 
     constructor() {
-        this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-        this.statusBarItem.text = "$(pulse) Flow State: Optimal";
-        this.statusBarItem.show();
+        // this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+        // this.statusBarItem.text = "$(pulse) Flow State: Optimal";
+        // this.statusBarItem.show();
         
         this.updateHoverPopup();
 
@@ -222,13 +222,13 @@ export class CognitiveLoadTracker {
         }
 
         // Apply instant color changes
-        if (isHighLoad) {
-            this.statusBarItem.text = `$(warning) High Cognitive Load: ${loadReason}`;
-            this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
-        } else {
-            this.statusBarItem.text = "$(pulse) Flow State: Optimal";
-            this.statusBarItem.backgroundColor = undefined;
-        }
+        // if (isHighLoad) {
+        //     this.statusBarItem.text = `$(warning) High Cognitive Load: ${loadReason}`;
+        //     this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+        // } else {
+        //     this.statusBarItem.text = "$(pulse) Flow State: Optimal";
+        //     this.statusBarItem.backgroundColor = undefined;
+        // }
 
         this.updateHoverPopup();
     }
@@ -257,7 +257,7 @@ export class CognitiveLoadTracker {
             }
         }
 
-        this.statusBarItem.tooltip = tooltip;
+        // this.statusBarItem.tooltip = tooltip;
     }
 
     private lastWarningTime = 0;
