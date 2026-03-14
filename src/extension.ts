@@ -1,16 +1,12 @@
 import * as vscode from 'vscode';
-import { StatusBar } from './StatusBar'
+import { StatusBar } from './StatusBar';
 import { checkZombiePackages } from './zombiePackages';
-import * as path from "path";
-import { ContextSwitchTracker } from "./context_switch/contextSwitchManager";
-import { WarningManager } from "./context_switch/warningManager";
-
+import { ContextSwitchManager } from "./contextSwitch";
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Congratulations, your extension "flow-state" is now active!');
 
     const flowStateStatusBar = new StatusBar();
-	const warningManager = new WarningManager();
 
     const disposableCommand = vscode.commands.registerCommand('flow-state.helloWorld', () => {
         vscode.window.showInformationMessage('Hello World from Flow-State!');
@@ -22,14 +18,14 @@ export function activate(context: vscode.ExtensionContext) {
 		checkZombiePackages(outputChannel);
 	});
 
-	const contextSwitch = new ContextSwitchTracker(() => warningManager.showWarning());
+    const contextSwitchManager = new ContextSwitchManager();
 
     context.subscriptions.push(
         disposableCommand,
         flowStateStatusBar,
         outputChannel,
         zombieDisposable,
-		contextSwitch
+		contextSwitchManager
     );
 }
 
