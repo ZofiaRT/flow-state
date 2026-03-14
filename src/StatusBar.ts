@@ -37,36 +37,34 @@ export class StatusBar {
         this.complexityScore = score;
         
         if (!this.activeStatusBarWarning) {
-            if (this.complexityScore > 15) {
-                this.statusBarItem.text = `$(warning) High Cognitive Load`;
-                this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
-            } else {
-                this.statusBarItem.text = "$(pulse) Flow State: Optimal";
-                this.statusBarItem.backgroundColor = undefined;
-            }
+            this.statusBarItem.text = "$(pulse) Flow State: Optimal";
+            this.statusBarItem.backgroundColor = undefined;
         }
 
         this.updateHoverPopup();
     }
 
-    public showTemporaryWarning(message: string) {
+    public flashStatusBar(message: string) {
         if (this.statusBarTimeout) { clearTimeout(this.statusBarTimeout); }
-        if (this.tooltipTimeout) { clearTimeout(this.tooltipTimeout); }
 
         this.activeStatusBarWarning = message;
-        this.activeTooltipWarning = message;
-
         this.statusBarItem.text = `$(warning) ${message}`;
         this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
         this.updateHoverPopup();
 
-        // 1. Reset Status Bar after 5 seconds
         this.statusBarTimeout = setTimeout(() => {
             this.activeStatusBarWarning = null;
             this.updateComplexity(this.complexityScore);
         }, 5000);
+    }
 
-        // 2. Reset Tooltip after 60 seconds
+    public showTemporaryWarning(message: string) {
+        this.flashStatusBar(message); // Reuse the flash method for the UI
+
+        if (this.tooltipTimeout) { clearTimeout(this.tooltipTimeout); }
+        this.activeTooltipWarning = message;
+        this.updateHoverPopup();
+
         this.tooltipTimeout = setTimeout(() => {
             this.activeTooltipWarning = null;
             this.updateHoverPopup();
@@ -90,9 +88,17 @@ export class StatusBar {
         // Main Cognitive Load Section
         tooltip.appendMarkdown(`### Cognitive Load\n\n`);
 
-        if (this.activeTooltipWarning) {
+        const hasActivityWarning = !!this.activeTooltipWarning;
+        const hasComplexityWarning = this.isComplexityEnabled && this.complexityScore > 15;
+
+        if (hasActivityWarning || hasComplexityWarning) {
             tooltip.appendMarkdown(`#### Active Alerts\n\n`);
-            tooltip.appendMarkdown(`* ${this.activeTooltipWarning}\n\n`);
+            if (hasActivityWarning) {
+                tooltip.appendMarkdown(`* ${this.activeTooltipWarning}\n\n`);
+            }
+            if (hasComplexityWarning) {
+                tooltip.appendMarkdown(`* High Code Complexity (Score: ${this.complexityScore})\n\n`);
+            }
         } else {
             tooltip.appendMarkdown(`#### Active Alerts\n\n`);
             tooltip.appendMarkdown(`* $(check) Optimal\n\n`);

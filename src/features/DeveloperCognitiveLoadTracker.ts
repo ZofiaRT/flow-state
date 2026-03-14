@@ -4,6 +4,7 @@ import { ActivityTracker } from './ActivityTracker';
 
 export class CognitiveLoadTracker {
     public currentComplexityScore = 0;
+    private previousComplexityScore = 0;
     private statusBar: StatusBar;
     private activityTracker: ActivityTracker;
 
@@ -108,32 +109,43 @@ export class CognitiveLoadTracker {
 
         if (!isMasterEnabled) {
             this.currentComplexityScore = 0;
+            this.previousComplexityScore = 0;
             this.statusBar.updateComplexity(0); 
             return;
         }
 
-        // 1. Evaluate Code Complexity (Silent baseline UI)
+        // 1. Evaluate Code Complexity
         if (isComplexityEnabled) {
             const editor = vscode.window.activeTextEditor;
             if (editor) {
                 const documentText = editor.document.getText();
                 this.currentComplexityScore = this.calculateCognitiveComplexity(documentText);
+                
+                if (this.currentComplexityScore > 15) {
+                    if (this.currentComplexityScore > this.previousComplexityScore) {
+                        this.statusBar.flashStatusBar(`Complexity Increased (Score: ${this.currentComplexityScore})`);
+                    }
+                }
+                
+                this.previousComplexityScore = this.currentComplexityScore;
+
             } else {
-                this.currentComplexityScore = 0; 
+                this.currentComplexityScore = 0;
+                this.previousComplexityScore = 0;
             }
         }
 
-        // 2. Evaluate Add-Delete Ratio (Triggers 3-second flash)
+        // 2. Evaluate Add-Delete Ratio
         if (isAddDeleteEnabled) {
             const ratio = this.activityTracker.getAddDeleteRatio();
-            if (this.activityTracker.charactersDeleted > 50 && ratio < addDeleteRatioThreshold) {
+            if (this.activityTracker.charactersAdded > 0 && this.activityTracker.charactersDeleted > 100 && ratio < addDeleteRatioThreshold) {
                 this.statusBar.showTemporaryWarning("High Deletion Rate (Stuck?)");
                 this.activityTracker.charactersDeleted = 0;
                 this.activityTracker.charactersAdded = 0;
             }
         }
 
-        // 3. Evaluate Read-Write Ratio (Triggers 3-second flash)
+        // 3. Evaluate Read-Write Ratio
         if (isReadWriteEnabled) {
             const timeReadingMs = this.activityTracker.getTimeSinceLastWriteMs();
             if (this.activityTracker.isScrolling && timeReadingMs > readWriteThresholdMs) { 
