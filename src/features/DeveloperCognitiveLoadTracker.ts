@@ -1,15 +1,18 @@
 import * as vscode from 'vscode';
 import { StatusBar } from '../StatusBar';
+import { ActivityTracker } from './ActivityTracker';
 
 export class CognitiveLoadTracker {
     public currentComplexityScore = 0;
     private statusBar: StatusBar;
+    private activityTracker: ActivityTracker;
 
-    constructor(statusBar: StatusBar) {
+    constructor(statusBar: StatusBar, activityTracker: ActivityTracker) {
         this.statusBar = statusBar;
+        this.activityTracker = activityTracker;
 
         vscode.workspace.onDidChangeConfiguration(e => {
-            if (e.affectsConfiguration('flow-state.enableCognitiveComplexity')) {
+            if (e.affectsConfiguration('flow-state')) {
                 this.evaluateCognitiveLoad();
             }
         });
@@ -90,22 +93,53 @@ export class CognitiveLoadTracker {
         return score;
     }
 
-    private evaluateCognitiveLoad() {
+    public evaluateCognitiveLoad() {
         const config = vscode.workspace.getConfiguration('flow-state');
-        const isEnabled = config.get<boolean>('enableCognitiveComplexity', true);
+        
+        const isMasterEnabled = config.get<boolean>('enableCognitiveLoadTracker', true);
+        const isComplexityEnabled = config.get<boolean>('enableCodeComplexity', true);
+        const isReadWriteEnabled = config.get<boolean>('enableReadWriteTracking', true);
+        const isAddDeleteEnabled = config.get<boolean>('enableAddDeleteTracking', true);
+        
+        const readWriteThresholdMs = config.get<number>('readWriteTimeThresholdSeconds', 120) * 1000;
+        const addDeleteRatioThreshold = config.get<number>('addDeleteRatioThreshold', 0.5);
 
-        if (!isEnabled) {
+        this.statusBar.updateConfigState(isMasterEnabled, isComplexityEnabled);
+
+        if (!isMasterEnabled) {
             this.currentComplexityScore = 0;
-            this.statusBar.updateComplexity(0);
+            this.statusBar.updateComplexity(0); 
             return;
         }
 
-        const editor = vscode.window.activeTextEditor;
-        if (editor) {
-            const documentText = editor.document.getText();
-            this.currentComplexityScore = this.calculateCognitiveComplexity(documentText);
-        } else {
-            this.currentComplexityScore = 0; 
+        // 1. Evaluate Code Complexity (Silent baseline UI)
+        if (isComplexityEnabled) {
+            const editor = vscode.window.activeTextEditor;
+            if (editor) {
+                const documentText = editor.document.getText();
+                this.currentComplexityScore = this.calculateCognitiveComplexity(documentText);
+            } else {
+                this.currentComplexityScore = 0; 
+            }
+        }
+
+        // 2. Evaluate Add-Delete Ratio (Triggers 3-second flash)
+        if (isAddDeleteEnabled) {
+            const ratio = this.activityTracker.getAddDeleteRatio();
+            if (this.activityTracker.charactersDeleted > 50 && ratio < addDeleteRatioThreshold) {
+                this.statusBar.showTemporaryWarning("High Deletion Rate (Stuck?)");
+                this.activityTracker.charactersDeleted = 0;
+                this.activityTracker.charactersAdded = 0;
+            }
+        }
+
+        // 3. Evaluate Read-Write Ratio (Triggers 3-second flash)
+        if (isReadWriteEnabled) {
+            const timeReadingMs = this.activityTracker.getTimeSinceLastWriteMs();
+            if (this.activityTracker.isScrolling && timeReadingMs > readWriteThresholdMs) { 
+                this.statusBar.showTemporaryWarning("Heavy Reading/Tracing");
+                this.activityTracker.lastWriteTime = Date.now();
+            }
         }
 
         this.statusBar.updateComplexity(this.currentComplexityScore);
