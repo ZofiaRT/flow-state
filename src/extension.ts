@@ -1,19 +1,25 @@
 import * as vscode from 'vscode';
 import { CognitiveLoadTracker } from './developerCognitiveLoad';
+import { StatusBar } from './StatusBar'
+import { checkZombiePackages } from './zombiePackages';
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Flow-State extension is now active!');
+    console.log('Congratulations, your extension "flow-state" is now active!');
+
+    const flowStateStatusBar = new StatusBar();
 
     const loadTracker = new CognitiveLoadTracker();
-    
-    context.subscriptions.push(
-        loadTracker.statusBarItem,
-        vscode.workspace.onDidChangeTextDocument(e => loadTracker.onDocumentChanged(e)),
-        vscode.window.onDidChangeActiveTextEditor(e => loadTracker.onEditorChanged(e)),
-        vscode.window.onDidChangeTextEditorVisibleRanges(e => loadTracker.onScrolled(e))
-    );
 
-    // --- NEW: The Teleport Command triggered by clicking the popup links ---
+    const disposableCommand = vscode.commands.registerCommand('flow-state.helloWorld', () => {
+        vscode.window.showInformationMessage('Hello World from Flow-State!');
+    });
+
+    const outputChannel = vscode.window.createOutputChannel('Flow-State');
+
+	const zombieDisposable = vscode.commands.registerCommand('flow-state.checkZombiePackages', () => {
+		checkZombiePackages(outputChannel);
+	});
+
     const teleportCommand = vscode.commands.registerCommand('flow-state.teleport', async (args: { path: string, line: number }) => {
         // Find the file and open it
         const uri = vscode.Uri.file(args.path);
@@ -26,7 +32,17 @@ export function activate(context: vscode.ExtensionContext) {
         editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
     });
 
-    context.subscriptions.push(teleportCommand);
+    context.subscriptions.push(
+        disposableCommand,
+        flowStateStatusBar,
+        outputChannel,
+        zombieDisposable,
+        teleportCommand,
+        loadTracker.statusBarItem,
+        vscode.workspace.onDidChangeTextDocument(e => loadTracker.onDocumentChanged(e)),
+        vscode.window.onDidChangeActiveTextEditor(e => loadTracker.onEditorChanged(e)),
+        vscode.window.onDidChangeTextEditorVisibleRanges(e => loadTracker.onScrolled(e))
+    );
 }
 
 export function deactivate() {}
