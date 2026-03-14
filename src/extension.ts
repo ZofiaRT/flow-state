@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { CognitiveLoadTracker } from './features/developerCognitiveLoadTracker';
+import { CognitiveLoadTracker } from './features/DeveloperCognitiveLoadTracker';
 import { StatusBar } from './StatusBar'
 import { checkZombiePackages } from './zombiePackages';
 import { ActivityTracker } from './features/ActivityTracker';
