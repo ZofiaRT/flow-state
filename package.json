@@ -18,6 +18,10 @@
       {
         "command": "flow-state.helloWorld",
         "title": "Flow-State: Hello World"
+      },
+      {
+        "command": "flow-state.checkZombiePackages",
+        "title": "Flow-State: Check Zombie Packages"
       }
     ]
   },

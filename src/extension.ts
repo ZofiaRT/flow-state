@@ -1,35 +1,37 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { StatusBar } from './StatusBar'
+import { checkZombiePackages } from './zombiePackages';
 import * as path from "path";
 import { ContextSwitchTracker } from "./context_switch/contextSwitchManager";
 import { WarningManager } from "./context_switch/warningManager";
 
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "flow-state" is now active!');
+    console.log('Congratulations, your extension "flow-state" is now active!');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	//const disposable = vscode.commands.registerCommand('flow-state.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		//vscode.window.showInformationMessage('Hello World from Flow-State!');
-	//});
-
-	//context.subscriptions.push(disposable);
-    
-	// Context Switch
+    const flowStateStatusBar = new StatusBar();
 	const warningManager = new WarningManager();
-    const tracker = new ContextSwitchTracker(() => warningManager.showWarning());
 
-	context.subscriptions.push(tracker);
+    const disposableCommand = vscode.commands.registerCommand('flow-state.helloWorld', () => {
+        vscode.window.showInformationMessage('Hello World from Flow-State!');
+    });
+
+    const outputChannel = vscode.window.createOutputChannel('Flow-State');
+
+	const zombieDisposable = vscode.commands.registerCommand('flow-state.checkZombiePackages', () => {
+		checkZombiePackages(outputChannel);
+	});
+
+	const contextSwitch = new ContextSwitchTracker(() => warningManager.showWarning());
+
+    context.subscriptions.push(
+        disposableCommand,
+        flowStateStatusBar,
+        outputChannel,
+        zombieDisposable,
+		contextSwitch
+    );
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
+
