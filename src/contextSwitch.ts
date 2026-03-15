@@ -7,12 +7,15 @@ const SWITCH_THRESHOLD = 8;
 const SNOOZE_DURATION = 5 * 60 * 1000;
 const DISMISS_COOLDOWN = 1 * 60 * 1000;
 
+const FILE_SWITCH_WEIGHT = 1;
+const FOLDER_SWITCH_WEIGHT = 3;
+
 /** 
  * Tracks context-switch events using a sliding window and fires an alert. 
  */
 export class ContextSwitchManager implements vscode.Disposable {
 
-  private switchTimestamps: number[] = [];
+  private switchEvents: { time: number; weight: number }[] = [];
   private cooldownExpiresAt = 0;
 
   private lastFilePath?: string;
@@ -34,36 +37,47 @@ export class ContextSwitchManager implements vscode.Disposable {
     const filePath = editor.document.uri.fsPath;
     const folderPath = path.dirname(filePath);
 
+    let weight = 0;
+
     const fileChanged =
       this.lastFilePath && filePath !== this.lastFilePath;
 
     const folderChanged =
       this.lastFolderPath && folderPath !== this.lastFolderPath;
 
-    if (fileChanged || folderChanged) {
-      this.recordSwitch();
+    if (folderChanged) {
+      weight = FOLDER_SWITCH_WEIGHT;
+    } else if (fileChanged) {
+      weight = FILE_SWITCH_WEIGHT;
+    }
+
+    if (weight > 0) {
+      this.recordSwitch(weight);
     }
 
     this.lastFilePath = filePath;
     this.lastFolderPath = folderPath;
   }
 
-  private async recordSwitch() {
+  private async recordSwitch(weight: number) {
     const now = Date.now();
 
-    // Append timestamps
-    this.switchTimestamps.push(now);
+    // Append timestamps with weights
+    this.switchEvents.push({ time: now, weight });
 
-    this.switchTimestamps = this.switchTimestamps.filter(
-      t => now - t < WINDOW_DURATION
+    this.switchEvents = this.switchEvents.filter(
+      e => now - e.time < WINDOW_DURATION
     );
 
-    console.log(
-      `[flow-state] switches in window: ${this.switchTimestamps.length}`
+    const score = this.switchEvents.reduce(
+      (sum, e) => sum + e.weight,
+      0
     );
 
-    if (
-      this.switchTimestamps.length > SWITCH_THRESHOLD &&
+    console.log(`[flow-state] switch score: ${score}`);
+
+   if (
+      score > SWITCH_THRESHOLD &&
       now > this.cooldownExpiresAt &&
       !this.isShowingWarning
     ) {
@@ -93,7 +107,7 @@ export class ContextSwitchManager implements vscode.Disposable {
       }
     });
     
-    this.switchTimestamps = [];
+    this.switchEvents = [];
     console.log("[flow-state] Dismissed: 1 minute cooldown");
     
     setTimeout(() => {
