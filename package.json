@@ -16,6 +16,10 @@
       {
         "command": "flow-state.checkZombiePackages",
         "title": "Flow-State: Check Zombie Packages"
+      },
+      {
+        "command": "flow-state.analyzePR",
+        "title": "Flow-State: Analyze PR (Reviewer Load)"
       }
     ],
     "configuration": {
@@ -60,6 +64,16 @@
           "type": "number",
           "default": 600,
           "description": "The number of characters inserted at once that triggers a 'High Review Load' warning within Developer Cognitive Load tracker."
+        },
+        "flow-state.enableReviewerLoadTracking": {
+          "type": "boolean",
+          "default": true,
+          "description": "Master Switch: Enable tracking for Reviewer Cognitive Load (analyzes staged Git files)."
+        },
+        "flow-state.reviewerLocThreshold": {
+          "type": "number",
+          "default": 400,
+          "description": "The maximum number of modified Lines of Code (LOC) allowed in a PR before triggering a Reviewer Fatigue warning."
         }
       }
     }
