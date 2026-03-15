@@ -16,6 +16,10 @@ export function activate(context: vscode.ExtensionContext) {
         activityTracker.onDocumentChanged(e);
         developerCognitiveLoadTracker.onDocumentChanged(e)
     });
+    const scrollDisposable = vscode.window.onDidChangeTextEditorVisibleRanges(e => {
+        activityTracker.onScrolled(e);
+        developerCognitiveLoadTracker.evaluateCognitiveLoad(); // <-- ADD THIS LINE
+    });
 
     const outputChannel = vscode.window.createOutputChannel('Flow-State');
 
@@ -28,7 +32,8 @@ export function activate(context: vscode.ExtensionContext) {
         outputChannel,
         zombieDisposable,
         editorChangeDisposable,
-        documentChangeDisposable
+        documentChangeDisposable,
+        scrollDisposable
     );
 }
 
