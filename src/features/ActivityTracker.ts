@@ -12,6 +12,9 @@ export class ActivityTracker {
     public lastWriteTime: number = Date.now();
     public isScrolling: boolean = false;
 
+    // 4. AI Usage
+    public recentPastedCharacters: number = 0;
+
     constructor() {}
 
     public onDocumentChanged(event: vscode.TextDocumentChangeEvent) {
@@ -23,6 +26,9 @@ export class ActivityTracker {
                 this.charactersDeleted += change.rangeLength;
             } else {
                 this.charactersAdded += change.text.length;
+                if (change.text.length > 50) {
+                    this.recentPastedCharacters = change.text.length;
+                }
             }
         }
     }

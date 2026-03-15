@@ -50,6 +50,16 @@
           "type": "number",
           "default": 0.5,
           "description": "If the ratio of added to deleted characters falls below this value (with high deletion count), trigger a 'Stuck' warning within Developer Cognitive Load tracker."
+        },
+        "flow-state.enableLargeInsertionTracking": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable tracking for massive text insertions (like pasting AI-generated code) within Developer Cognitive Load tracker."
+        },
+        "flow-state.largeInsertionThresholdChars": {
+          "type": "number",
+          "default": 600,
+          "description": "The number of characters inserted at once that triggers a 'High Review Load' warning within Developer Cognitive Load tracker."
         }
       }
     }

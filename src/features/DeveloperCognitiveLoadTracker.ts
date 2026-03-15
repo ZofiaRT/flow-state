@@ -105,6 +105,9 @@ export class CognitiveLoadTracker {
         const readWriteThresholdMs = config.get<number>('readWriteTimeThresholdSeconds', 120) * 1000;
         const addDeleteRatioThreshold = config.get<number>('addDeleteRatioThreshold', 0.5);
 
+        const isInsertionEnabled = config.get<boolean>('enableLargeInsertionTracking', true);
+        const insertionThreshold = config.get<number>('largeInsertionThresholdChars', 600);
+
         this.statusBar.updateConfigState(isMasterEnabled, isComplexityEnabled);
 
         if (!isMasterEnabled) {
@@ -152,6 +155,12 @@ export class CognitiveLoadTracker {
                 this.statusBar.showTemporaryWarning("Heavy Reading/Tracing");
                 this.activityTracker.lastWriteTime = Date.now();
             }
+        }
+
+        // 4. Evaluate Large (AI) Insertions
+        if (isInsertionEnabled && this.activityTracker.recentPastedCharacters >= insertionThreshold) {
+            this.statusBar.showTemporaryWarning(`Large Code Insertion (${this.activityTracker.recentPastedCharacters} chars) - High Review Load!`);
+            this.activityTracker.recentPastedCharacters = 0;
         }
 
         this.statusBar.updateComplexity(this.currentComplexityScore);
