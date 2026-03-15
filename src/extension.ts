@@ -4,6 +4,7 @@ import { StatusBar } from './StatusBar';
 import { checkZombiePackages } from './zombiePackages';
 import { ActivityTracker } from './features/ActivityTracker';
 import { ReviewerTracker } from './features/ReviewerTracker';
+import { ContextSwitchManager } from "./contextSwitch";
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Congratulations, your extension "flow-state" is now active!');
@@ -59,6 +60,8 @@ export function activate(context: vscode.ExtensionContext) {
     // Run it once on startup just in case files are already staged
     reviewerTracker.analyzePR();
 
+    const contextSwitchManager = new ContextSwitchManager();
+
     context.subscriptions.push(
         flowStateStatusBar,
         outputChannel,
@@ -66,7 +69,8 @@ export function activate(context: vscode.ExtensionContext) {
         analyzePrDisposable,
         editorChangeDisposable,
         documentChangeDisposable,
-        scrollDisposable
+        scrollDisposable,
+		contextSwitchManager
     );
 }
 
