@@ -37,7 +37,7 @@ export class ReviewerTracker {
 
         try {
             // Run git command to get staged files and their Added/Deleted line counts
-            const { stdout } = await exec('git diff --cached --numstat', { cwd: workspacePath });
+            const { stdout } = await exec('git diff --cached --numstat --relative', { cwd: workspacePath });
             
             if (!stdout || stdout.trim() === '') {
                 this.statusBar.updateReviewerStats(true, 0, 0, 0, false);
@@ -71,16 +71,16 @@ export class ReviewerTracker {
                 totalFiles++;
                 totalLoc += parseInt(addedStr, 10) + parseInt(deletedStr, 10);
 
-                // Check Cognitive Complexity (Only for code .ts, .js files)
+                // Check Cognitive Complexity
                 if (/\.(ts|tsx|js|jsx|mjs|cjs)$/.test(filePath)) {
                     const fullPath = path.join(workspacePath, filePath);
+                    
                     try {
-                        // Read the file content from the workspace
                         const fileData = await vscode.workspace.fs.readFile(vscode.Uri.file(fullPath));
                         const fileText = Buffer.from(fileData).toString('utf8');
                         
-                        // Use our shared complexity function
                         const score = calculateCognitiveComplexity(fileText);
+                        
                         if (score > 15) {
                             complexFilesCount++;
                         }
