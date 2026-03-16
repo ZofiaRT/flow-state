@@ -26,8 +26,8 @@ export class PomodoroTimer implements vscode.Disposable {
     private HIGH_COMPLEXITY_THRESHOLD = 25;
     
     // Adjustment multipliers (relative/proportional)
-    private GOOD_FOCUS_MULTIPLIER = 1.1; // 20% bonus for good focus
-    private HIGH_LOAD_MULTIPLIER = 0.9; // 20% reduction for high complexity
+    private GOOD_FOCUS_MULTIPLIER = 1.2; // 20% bonus for good focus
+    private HIGH_LOAD_MULTIPLIER = 0.8; // 20% reduction for high complexity
     private MAX_MULTIPLIER = 1.5; // Cap: never more than 30% longer
     private MIN_MULTIPLIER = 0.5; // Cap: never more than 30% shorter
     
