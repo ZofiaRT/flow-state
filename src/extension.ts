@@ -5,8 +5,20 @@ import { ActivityTracker } from './features/ActivityTracker';
 import { StatusBar } from './StatusBar';
 import { ContextSwitchManager } from "./contextSwitch";
 
+function handleOnboarding(context: vscode.ExtensionContext) {
+    const hasSeenOnboarding = context.globalState.get('flowState.hasSeenOnboarding');
+
+    if (!hasSeenOnboarding) {
+        const extensionId = context.extension.id;
+        const walkthroughId = `${extensionId}#flowState.welcome`;
+        
+        vscode.commands.executeCommand('workbench.action.openWalkthrough', walkthroughId, false);
+        context.globalState.update('flowState.hasSeenOnboarding', true);
+    }
+}
+
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Congratulations, your extension "flow-state" is now active!');
+    handleOnboarding(context);
 
     const flowStateStatusBar = new StatusBar();
     const activityTracker = new ActivityTracker();
