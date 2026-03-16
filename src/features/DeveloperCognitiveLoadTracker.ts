@@ -164,5 +164,6 @@ export class CognitiveLoadTracker {
         }
 
         this.statusBar.updateComplexity(this.currentComplexityScore);
+        console.log(`Cognitive Load Evaluated: Complexity=${this.currentComplexityScore}, Add/Delete Ratio=${isAddDeleteEnabled ? this.activityTracker.getAddDeleteRatio().toFixed(2) : 'N/A'}, Time Since Last Write=${isReadWriteEnabled ? (this.activityTracker.getTimeSinceLastWriteMs() / 1000).toFixed(1) + 's' : 'N/A'}`);
     }
 }
