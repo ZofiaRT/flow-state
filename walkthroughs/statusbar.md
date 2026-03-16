@@ -1,6 +1,6 @@
 # Keep Your Flow Optimal
 
-Flow-State runs quietly in the background to make sure you aren't burning out. 
+Flow-State runs quietly in the background to protect you from burnout. 
 
 Look at the bottom right of your VS Code window for the **Flow State** indicator. 
 
