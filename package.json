@@ -34,6 +34,22 @@
             "media": {
               "markdown": "walkthroughs/statusbar.md"
             }
+          },
+          {
+            "id": "flowState.cognitiveLoad",
+            "title": "Prevent Mental Fatigue",
+            "description": "Flow-State tracks your typing habits—like heavy reading, massive deletions, or pasting large AI snippets—to warn you when your cognitive load is getting too high.",
+            "media": {
+              "markdown": "walkthroughs/cognitiveload.md"
+            }
+          },
+          {
+            "id": "flowState.configuration",
+            "title": "Choose Your Protections",
+            "description": "Customize Flow-State to your liking. You can turn individual tracking features on or off.",
+            "media": {
+              "markdown": "walkthroughs/settings.md"
+            }
           }
         ]
       }
