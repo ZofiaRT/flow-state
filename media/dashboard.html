@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src {{cspSource}}; script-src 'nonce-{{nonce}}';">
+    <link rel="stylesheet" href="{{styleUri}}">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Flow State Dashboard</h1>
+    <p class="subtitle">Real-time cognitive load metrics for your current session</p>
+
+    <div id="overall-badge" class="badge"></div>
+
+    <p class="section-title">Metrics</p>
+    <div class="grid">
+        <div class="card" id="card-adddelete">
+            <div class="card-header">
+                <span class="card-title">Add / Delete Ratio</span>
+                <span class="card-icon"></span>
+            </div>
+            <div class="card-value" id="val-adddelete"></div>
+            <div class="card-detail" id="detail-adddelete"></div>
+        </div>
+        <div class="card" id="card-readwrite">
+            <div class="card-header">
+                <span class="card-title">Time Since Last Write</span>
+                <span class="card-icon"></span>
+            </div>
+            <div class="card-value" id="val-readwrite"></div>
+            <div class="card-detail" id="detail-readwrite"></div>
+        </div>
+
+    </div>
+
+    <script nonce="{{nonce}}" src="{{scriptUri}}"></script>
+</body>
+</html>

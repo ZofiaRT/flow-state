@@ -19,6 +19,10 @@
       {
         "command": "flow-state.checkZombiePackages",
         "title": "Flow-State: Check Zombie Packages"
+      },
+      {
+        "command": "flow-state.openDashboard",
+        "title": "Flow-State: Open Dashboard"
       }
     ],
     "walkthroughs": [

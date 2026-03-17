@@ -1,0 +1,117 @@
+body {
+    font-family: var(--vscode-font-family);
+    background: var(--vscode-editor-background);
+    color: var(--vscode-editor-foreground);
+    margin: 0;
+    padding: 24px;
+}
+
+h1 {
+    font-size: 1.4rem;
+    margin: 0 0 4px 0;
+    font-weight: 600;
+}
+
+.subtitle {
+    font-size: 0.85rem;
+    color: var(--vscode-descriptionForeground);
+    margin: 0 0 24px 0;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 6px 14px;
+    margin-bottom: 28px;
+    border: 1px solid;
+}
+
+.badge.good {
+    color: #4ec9b0;
+    background: #4ec9b022;
+    border-color: #4ec9b0;
+}
+
+.badge.warning {
+    color: #f0a500;
+    background: #f0a50022;
+    border-color: #f0a500;
+}
+
+.section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--vscode-descriptionForeground);
+    margin: 0 0 12px 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.card {
+    background: var(--vscode-sideBar-background, #1e1e1e);
+    border-radius: 6px;
+    padding: 16px;
+    border-left: 4px solid;
+}
+
+.card.good  {
+    border-left-color: #4ec9b0; 
+}
+
+.card.warning {
+    border-left-color: #f0a500;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.card-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--vscode-descriptionForeground);
+}
+
+.card-icon {
+    font-size: 1rem;
+}
+
+.card.good  .card-icon { color: #4ec9b0; }
+.card.warning .card-icon { color: #f0a500; }
+
+.card-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.card-detail {
+    font-size: 0.78rem;
+    color: var(--vscode-descriptionForeground);
+}
+
+.file-row {
+    font-size: 0.82rem;
+    color: var(--vscode-descriptionForeground);
+    margin-bottom: 24px;
+}
+
+.file-row span {
+    color: var(--vscode-editor-foreground);
+    font-weight: 500;
+}

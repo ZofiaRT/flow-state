@@ -16,7 +16,8 @@ export class StatusBar {
     constructor() {
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
         this.statusBarItem.text = "$(pulse) Flow State: Optimal";
-        
+        this.statusBarItem.command = 'flow-state.openDashboard';
+
         this.updateHoverPopup();
         this.statusBarItem.show();
     }
