@@ -124,7 +124,10 @@ export class CognitiveLoadTracker {
                 const documentText = editor.document.getText();
                 this.currentComplexityScore = this.calculateCognitiveComplexity(documentText);
                 
-                if (this.currentComplexityScore > 15) {
+                if (this.currentComplexityScore < this.previousComplexityScore) {
+                    this.statusBar.flashSuccessBar(`Complexity Reduced! (Score: ${this.currentComplexityScore})`);
+                } 
+                else if (this.currentComplexityScore > 15 && this.currentComplexityScore > this.previousComplexityScore) {
                     if (this.currentComplexityScore > this.previousComplexityScore) {
                         this.statusBar.flashStatusBar(`Complexity Increased (Score: ${this.currentComplexityScore})`);
                     }
@@ -159,7 +162,7 @@ export class CognitiveLoadTracker {
 
         // 4. Evaluate Large (AI) Insertions
         if (isInsertionEnabled && this.activityTracker.recentPastedCharacters >= insertionThreshold) {
-            this.statusBar.showTemporaryWarning(`Large Code Insertion (${this.activityTracker.recentPastedCharacters} chars) - High Review Load!`);
+            this.statusBar.showTemporaryWarning(`Large Code Insertion (${this.activityTracker.recentPastedCharacters} chars) - Context Overload Risk!`);
             this.activityTracker.recentPastedCharacters = 0;
         }
 

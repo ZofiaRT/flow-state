@@ -39,6 +39,7 @@ export class StatusBar {
         if (!this.activeStatusBarWarning) {
             this.statusBarItem.text = "$(pulse) Flow State: Optimal";
             this.statusBarItem.backgroundColor = undefined;
+            this.statusBarItem.color = undefined;
         }
 
         this.updateHoverPopup();
@@ -50,6 +51,23 @@ export class StatusBar {
         this.activeStatusBarWarning = message;
         this.statusBarItem.text = `$(warning) ${message}`;
         this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+        this.updateHoverPopup();
+
+        this.statusBarTimeout = setTimeout(() => {
+            this.activeStatusBarWarning = null;
+            this.updateComplexity(this.complexityScore);
+        }, 5000);
+    }
+
+    public flashSuccessBar(message: string) {
+        if (this.statusBarTimeout) { clearTimeout(this.statusBarTimeout); }
+
+        this.activeStatusBarWarning = message; 
+        
+        this.statusBarItem.text = `$(pass) ${message}`; // Uses the built-in checkmark icon
+        this.statusBarItem.backgroundColor = undefined; 
+        this.statusBarItem.color = new vscode.ThemeColor('terminal.ansiGreen'); // Makes the text green
+        
         this.updateHoverPopup();
 
         this.statusBarTimeout = setTimeout(() => {
