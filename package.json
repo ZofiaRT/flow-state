@@ -10,15 +10,17 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onStartupFinished"
-  ],
+  "activationEvents": ["onStartupFinished"],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "flow-state.checkZombiePackages",
         "title": "Flow-State: Check Zombie Packages"
+      },
+      {
+        "command": "flow-state.analyzePR",
+        "title": "Flow-State: Analyze PR (Reviewer Load)"
       }
     ],
     "walkthroughs": [
@@ -67,6 +69,11 @@
           "default": true,
           "description": "Enable Code Complexity tracking within Developer Cognitive Load tracker."
         },
+        "flow-state.complexityThreshold": {
+          "type": "number",
+          "default": 15,
+          "description": "The maximum allowed cognitive complexity score per file before triggering a warning."
+        },
         "flow-state.enableReadWriteTracking": {
           "type": "boolean",
           "default": true,
@@ -96,6 +103,16 @@
           "type": "number",
           "default": 600,
           "description": "The number of characters inserted at once that triggers a 'High Review Load' warning within Developer Cognitive Load tracker."
+        },
+        "flow-state.enableReviewerLoadTracking": {
+          "type": "boolean",
+          "default": true,
+          "description": "Master Switch: Enable tracking for Reviewer Cognitive Load (analyzes staged Git files)."
+        },
+        "flow-state.reviewerLocThreshold": {
+          "type": "number",
+          "default": 400,
+          "description": "The maximum number of modified Lines of Code (LOC) allowed in a PR before triggering a Reviewer Fatigue warning."
         }
       }
     }
@@ -115,15 +132,15 @@
     "test": "vscode-test"
   },
   "devDependencies": {
+    "@types/vscode": "^1.109.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "@types/vscode": "^1.109.0",
-    "@vscode/test-cli": "^0.0.11",
-    "@vscode/test-electron": "^2.5.2",
-    "esbuild": "^0.27.3",
+    "typescript-eslint": "^8.56.1",
     "eslint": "^9.39.3",
+    "esbuild": "^0.27.3",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.1"
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
   }
 }
