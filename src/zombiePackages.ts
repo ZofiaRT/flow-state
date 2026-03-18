@@ -187,3 +187,26 @@ export async function checkZombiePackages(outputChannel: vscode.OutputChannel): 
 
     outputChannel.appendLine(`Done. Total zombie packages found: ${totalZombies}`);
 }
+
+/**
+ * Silent helper for ReviewerTracker to get the exact number of zombie packages.
+ */
+export async function getZombieCount(workspaceFolders: readonly vscode.WorkspaceFolder[] | undefined): Promise<number> {
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+        return 0;
+    }
+
+    let totalZombies = 0;
+
+    for (const folder of workspaceFolders) {
+        const rootPath = folder.uri.fsPath;
+        const packageJsonFiles = findPackageJsonFiles(rootPath);
+
+        for (const pkgPath of packageJsonFiles) {
+            const { zombies } = findZombiesInPackageJson(pkgPath);
+            totalZombies += zombies.length;
+        }
+    }
+
+    return totalZombies;
+}
