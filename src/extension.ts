@@ -6,8 +6,20 @@ import { ActivityTracker } from './features/ActivityTracker';
 import { ReviewerTracker } from './features/ReviewerTracker';
 import { ContextSwitchManager } from "./contextSwitch";
 
+function handleOnboarding(context: vscode.ExtensionContext) {
+    const hasSeenOnboarding = context.globalState.get('flowState.hasSeenOnboarding');
+
+    if (!hasSeenOnboarding) {
+        const extensionId = context.extension.id;
+        const walkthroughId = `${extensionId}#flowState.welcome`;
+        
+        vscode.commands.executeCommand('workbench.action.openWalkthrough', walkthroughId, false);
+        context.globalState.update('flowState.hasSeenOnboarding', true);
+    }
+}
+
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Congratulations, your extension "flow-state" is now active!');
+    handleOnboarding(context);
 
     const flowStateStatusBar = new StatusBar();
     const activityTracker = new ActivityTracker();
@@ -23,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
     const scrollDisposable = vscode.window.onDidChangeTextEditorVisibleRanges(e => {
         activityTracker.onScrolled(e);
-        developerCognitiveLoadTracker.evaluateCognitiveLoad(); 
+        developerCognitiveLoadTracker.evaluateCognitiveLoad();
     });
 
     const outputChannel = vscode.window.createOutputChannel('Flow-State');
