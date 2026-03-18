@@ -10,11 +10,10 @@ const DISMISS_COOLDOWN = 1 * 60 * 1000;
 const FILE_SWITCH_WEIGHT = 1;
 const FOLDER_SWITCH_WEIGHT = 3;
 
-/** 
- * Tracks context-switch events using a sliding window and fires an alert. 
+/**
+ * Tracks context-switch events using a sliding window and fires an alert.
  */
 export class ContextSwitchManager implements vscode.Disposable {
-
   private switchEvents: { time: number; weight: number }[] = [];
   private cooldownExpiresAt = 0;
 
@@ -26,8 +25,8 @@ export class ContextSwitchManager implements vscode.Disposable {
   private isShowingWarning = false;
 
   constructor() {
-    this.listener = vscode.window.onDidChangeActiveTextEditor(editor =>
-      this.handleEditorChange(editor)
+    this.listener = vscode.window.onDidChangeActiveTextEditor((editor) =>
+      this.handleEditorChange(editor),
     );
   }
 
@@ -39,8 +38,7 @@ export class ContextSwitchManager implements vscode.Disposable {
 
     let weight = 0;
 
-    const fileChanged =
-      this.lastFilePath && filePath !== this.lastFilePath;
+    const fileChanged = this.lastFilePath && filePath !== this.lastFilePath;
 
     const folderChanged =
       this.lastFolderPath && folderPath !== this.lastFolderPath;
@@ -66,17 +64,14 @@ export class ContextSwitchManager implements vscode.Disposable {
     this.switchEvents.push({ time: now, weight });
 
     this.switchEvents = this.switchEvents.filter(
-      e => now - e.time < WINDOW_DURATION
+      (e) => now - e.time < WINDOW_DURATION,
     );
 
-    const score = this.switchEvents.reduce(
-      (sum, e) => sum + e.weight,
-      0
-    );
+    const score = this.switchEvents.reduce((sum, e) => sum + e.weight, 0);
 
     console.log(`[flow-state] switch score: ${score}`);
 
-   if (
+    if (
       score > SWITCH_THRESHOLD &&
       now > this.cooldownExpiresAt &&
       !this.isShowingWarning
@@ -85,31 +80,33 @@ export class ContextSwitchManager implements vscode.Disposable {
     }
   }
 
-  /** 
-   * Handles showing the context-switch warning and managing cooldowns. 
-   * - Snooze: suppresses the warning for 5 min; counting continues. 
-   * - Dismissed: applies a short 1-min cooldown; counting continues. 
+  /**
+   * Handles showing the context-switch warning and managing cooldowns.
+   * - Snooze: suppresses the warning for 5 min;
+   * - Dismissed: applies a short 1-min cooldown;
    */
   private async showWarning() {
     this.isShowingWarning = true;
 
     const now = Date.now();
-    
+
     this.cooldownExpiresAt = now + DISMISS_COOLDOWN;
-    
-    vscode.window.showWarningMessage(
-      "Frequent context switching detected! Try focusing on one task.",
-      "Snooze"
-    ).then(selection => {
-      if (selection === "Snooze") {
-        this.cooldownExpiresAt = Date.now() + SNOOZE_DURATION;
-        console.log("[flow-state] Snoozed 5 minutes");
-      }
-    });
-    
+
+    vscode.window
+      .showWarningMessage(
+        "Frequent context switching detected! Try focusing on one task.",
+        "Snooze",
+      )
+      .then((selection) => {
+        if (selection === "Snooze") {
+          this.cooldownExpiresAt = Date.now() + SNOOZE_DURATION;
+          console.log("[flow-state] Snoozed 5 minutes");
+        }
+      });
+
     this.switchEvents = [];
     console.log("[flow-state] Dismissed: 1 minute cooldown");
-    
+
     setTimeout(() => {
       this.isShowingWarning = false;
     }, DISMISS_COOLDOWN);

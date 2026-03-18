@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { StatusBar } from './StatusBar';
 import { checkZombiePackages } from './zombiePackages';
 import { ContextSwitchManager } from "./contextSwitch";
+import { InactiveTabsManager } from './inactiveTabs';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Congratulations, your extension "flow-state" is now active!');
@@ -19,13 +20,15 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
     const contextSwitchManager = new ContextSwitchManager();
+	const inactiveTabsManager = new InactiveTabsManager();
 
     context.subscriptions.push(
         disposableCommand,
         flowStateStatusBar,
         outputChannel,
         zombieDisposable,
-		contextSwitchManager
+		contextSwitchManager,
+		inactiveTabsManager
     );
 }
 
