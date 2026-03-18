@@ -25,6 +25,7 @@ export class ReviewerTracker {
     public async analyzePR() {
         const config = vscode.workspace.getConfiguration('flow-state');
         const isEnabled = config.get<boolean>('enableReviewerLoadTracking', true);
+        const complexityThreshold = config.get<number>('complexityThreshold', 15);
 
         if (!isEnabled) {
             this.statusBar.updateReviewerStats(false, 0, 0, 0, false);
@@ -81,7 +82,7 @@ export class ReviewerTracker {
                         
                         const score = calculateCognitiveComplexity(fileText);
                         
-                        if (score > 15) {
+                        if (score > complexityThreshold) {
                             complexFilesCount++;
                         }
                     } catch (err) {

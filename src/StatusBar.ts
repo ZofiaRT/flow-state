@@ -120,7 +120,9 @@ export class StatusBar {
         tooltip.appendMarkdown(`### Cognitive Load\n\n`);
 
         const hasActivityWarning = !!this.activeTooltipWarning;
-        const hasComplexityWarning = this.isComplexityEnabled && this.complexityScore > 15;
+        const complexityThreshold = vscode.workspace.getConfiguration('flow-state').get<number>('complexityThreshold', 15);
+
+        const hasComplexityWarning = this.isComplexityEnabled && this.complexityScore > complexityThreshold;
 
         if (hasActivityWarning || hasComplexityWarning) {
             tooltip.appendMarkdown(`#### Active Alerts\n\n`);
@@ -137,7 +139,7 @@ export class StatusBar {
 
         if (this.isComplexityEnabled) {
             tooltip.appendMarkdown(`#### Code Complexity\n\n`);
-            tooltip.appendMarkdown(`* Current File Score: **${this.complexityScore}** *(Threshold: 15)*\n\n`);
+            tooltip.appendMarkdown(`* Current File Score: **${this.complexityScore}** *(Threshold: ${complexityThreshold})*\n\n`);
         }
 
         // Reviewer Cognitive Load Section
@@ -157,7 +159,7 @@ export class StatusBar {
 
             // Complexity check
             const compIcon = this.reviewerComplexityFiles > 0 ? '$(warning) *Reviewer Fatigue Risk!*' : '$(check)';
-            tooltip.appendMarkdown(`* **Files with Complexity Score > 15:** ${this.reviewerComplexityFiles} ${compIcon}\n\n`);
+            tooltip.appendMarkdown(`* **Files with Complexity Score > ${complexityThreshold}:** ${this.reviewerComplexityFiles} ${compIcon}\n\n`);
 
             // Zombie check
             if (this.hasZombieWarning) {

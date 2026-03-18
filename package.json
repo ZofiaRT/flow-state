@@ -35,6 +35,11 @@
           "default": true,
           "description": "Enable Code Complexity tracking within Developer Cognitive Load tracker."
         },
+        "flow-state.complexityThreshold": {
+          "type": "number",
+          "default": 15,
+          "description": "The maximum allowed cognitive complexity score per file before triggering a warning."
+        },
         "flow-state.enableReadWriteTracking": {
           "type": "boolean",
           "default": true,

@@ -40,7 +40,7 @@ export class CognitiveLoadTracker {
         const isComplexityEnabled = config.get<boolean>('enableCodeComplexity', true);
         const isReadWriteEnabled = config.get<boolean>('enableReadWriteTracking', true);
         const isAddDeleteEnabled = config.get<boolean>('enableAddDeleteTracking', true);
-        
+        const complexityThreshold = config.get<number>('complexityThreshold', 15);
         const readWriteThresholdMs = config.get<number>('readWriteTimeThresholdSeconds', 120) * 1000;
         const addDeleteRatioThreshold = config.get<number>('addDeleteRatioThreshold', 0.5);
 
@@ -63,7 +63,7 @@ export class CognitiveLoadTracker {
                 const documentText = editor.document.getText();
                 this.currentComplexityScore = calculateCognitiveComplexity(documentText);
                 
-                if (this.currentComplexityScore > 15) {
+                if (this.currentComplexityScore > complexityThreshold) {
                     if (this.currentComplexityScore > this.previousComplexityScore) {
                         this.statusBar.flashStatusBar(`Complexity Increased (Score: ${this.currentComplexityScore})`);
                     }
