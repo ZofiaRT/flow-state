@@ -10,7 +10,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": ["onStartupFinished"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -19,13 +21,12 @@
         "title": "Flow-State: Check Zombie Packages"
       },
       {
-<<<<<<< HEAD
-        "command": "flow-state.openDashboard",
-        "title": "Flow-State: Open Dashboard"
-=======
         "command": "flow-state.analyzePR",
         "title": "Flow-State: Analyze PR (Reviewer Load)"
->>>>>>> origin/master
+      },
+      {
+        "command": "flow-state.openDashboard",
+        "title": "Flow-State: Open Dashboard"
       }
     ],
     "walkthroughs": [
