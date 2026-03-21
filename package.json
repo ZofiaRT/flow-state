@@ -102,12 +102,12 @@
         },
         "flow-state.readWriteTimeThresholdSeconds": {
           "type": "number",
-          "default": 120,
+          "default": 900,
           "description": "Time in seconds without typing before triggering a 'Heavy Reading' warning within Developer Cognitive Load tracker."
         },
         "flow-state.addDeleteRatioThreshold": {
           "type": "number",
-          "default": 0.5,
+          "default": 0.3,
           "description": "If the ratio of added to deleted characters falls below this value (with high deletion count), trigger a 'Stuck' warning within Developer Cognitive Load tracker."
         },
         "flow-state.enableLargeInsertionTracking": {
