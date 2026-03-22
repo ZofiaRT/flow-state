@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { CognitiveLoadTracker } from './features/DeveloperCognitiveLoadTracker';
+import { PomodoroTimer } from './features/PomodoroTimer';
 import { StatusBar } from './StatusBar';
 import { checkZombiePackages } from './zombiePackages';
 import { ActivityTracker } from './features/ActivityTracker';
@@ -22,23 +23,34 @@ function handleOnboarding(context: vscode.ExtensionContext) {
 export function activate(context: vscode.ExtensionContext) {
     handleOnboarding(context);
 
+    // Initialize core features
     const flowStateStatusBar = new StatusBar();
     const activityTracker = new ActivityTracker();
     const developerCognitiveLoadTracker = new CognitiveLoadTracker(flowStateStatusBar, activityTracker);
+    const pomodoroTimer = new PomodoroTimer(developerCognitiveLoadTracker);
+    const contextSwitchManager = new ContextSwitchManager();
+    const inactiveTabsManager = new InactiveTabsManager();
+
     
     // Initialize the Reviewer Tracker
     const reviewerTracker = new ReviewerTracker(flowStateStatusBar);
 
-    const editorChangeDisposable = vscode.window.onDidChangeActiveTextEditor(e => developerCognitiveLoadTracker.onEditorChanged(e));
+    // Register event listeners
+    const editorChangeDisposable = vscode.window.onDidChangeActiveTextEditor(e => 
+        developerCognitiveLoadTracker.onEditorChanged(e)
+    );
+    
     const documentChangeDisposable = vscode.workspace.onDidChangeTextDocument(e => { 
         activityTracker.onDocumentChanged(e);
         developerCognitiveLoadTracker.onDocumentChanged(e);
     });
+    
     const scrollDisposable = vscode.window.onDidChangeTextEditorVisibleRanges(e => {
         activityTracker.onScrolled(e);
         developerCognitiveLoadTracker.evaluateCognitiveLoad();
     });
 
+    // Create output channel
     const outputChannel = vscode.window.createOutputChannel('Flow-State');
 
     const zombieDisposable = vscode.commands.registerCommand('flow-state.checkZombiePackages', () => {
@@ -73,11 +85,28 @@ export function activate(context: vscode.ExtensionContext) {
     // Run it once on startup just in case files are already staged
     reviewerTracker.analyzePR();
 
-    const contextSwitchManager = new ContextSwitchManager();
-	const inactiveTabsManager = new InactiveTabsManager();
+    const startPomodoroDisposable = vscode.commands.registerCommand('flow-state.startPomodoro', () => {
+        pomodoroTimer.start();
+    });
+
+    const pausePomodoroDisposable = vscode.commands.registerCommand('flow-state.pausePomodoro', () => {
+        pomodoroTimer.pause();
+    });
+
+    const resumePomodoroDisposable = vscode.commands.registerCommand('flow-state.resumePomodoro', () => {
+        pomodoroTimer.resume();
+    });
+
+    const stopPomodoroDisposable = vscode.commands.registerCommand('flow-state.stopPomodoro', () => {
+        pomodoroTimer.stop();
+    });
+
+    // Add all disposables to subscriptions	const inactiveTabsManager = new InactiveTabsManager();
 
     context.subscriptions.push(
         flowStateStatusBar,
+        pomodoroTimer,
+        contextSwitchManager,
         outputChannel,
         zombieDisposable,
 		contextSwitchManager,
@@ -86,7 +115,11 @@ export function activate(context: vscode.ExtensionContext) {
         editorChangeDisposable,
         documentChangeDisposable,
         scrollDisposable,
-		contextSwitchManager
+        zombieDisposable,
+        startPomodoroDisposable,
+        pausePomodoroDisposable,
+        resumePomodoroDisposable,
+        stopPomodoroDisposable
     );
 }
 

@@ -32,9 +32,41 @@
           {
             "id": "flowState.statusBar",
             "title": "Monitor Your Flow State",
-            "description": "The Status Bar at the bottom right is the heart of this extension. It actively monitors your session . \n\n**Hover over it** at any time to reveal detailed session stats, including the **Code Complexity** score of your current file!",
+            "description": "The Status Bar at the bottom right is the heart of this extension. It actively monitors your session. \n\n**Hover over it** at any time to reveal detailed session stats, including the **Code Complexity** score of your current file!",
             "media": {
               "markdown": "walkthroughs/statusbar.md"
+            }
+          },
+          {
+            "id": "flowState.devCognitive",
+            "title": "Manage Developer Cognitive Load",
+            "description": "Flow-State monitors code complexity, reading time, and massive code insertions to prevent you from being overwhelmed.",
+            "media": {
+              "markdown": "walkthroughs/dev-cognitive.md"
+            }
+          },
+          {
+            "id": "flowState.reviewerCognitive",
+            "title": "Protect Your Reviewers",
+            "description": "Analyze your staged Git files to ensure your pull requests won't cause reviewer fatigue.",
+            "media": {
+              "markdown": "walkthroughs/reviewer-cognitive.md"
+            }
+          },
+          {
+            "id": "flowState.activityTracker",
+            "title": "Activity & Context Switching",
+            "description": "Track your activity and monitor how often you switch tabs to help you stay focused.",
+            "media": {
+              "markdown": "walkthroughs/activity-tracker.md"
+            }
+          },
+          {
+            "id": "flowState.settings",
+            "title": "Customize Your Experience",
+            "description": "Flow-State has a lot of features, but you don't have to use them all at once! Tailor it to fit your workflow.",
+            "media": {
+              "markdown": "walkthroughs/settings.md"
             }
           }
         ]
