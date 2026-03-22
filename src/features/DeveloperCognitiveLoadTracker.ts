@@ -78,10 +78,17 @@ export class CognitiveLoadTracker {
             }
         }
 
+        let activeAlertCount = 0;
+
+        if (isComplexityEnabled && this.currentComplexityScore > complexityThreshold) {
+            activeAlertCount++;
+        }
+
         // 2. Evaluate Add-Delete Ratio
         if (isAddDeleteEnabled) {
             const ratio = this.activityTracker.getAddDeleteRatio();
             if (this.activityTracker.charactersAdded > 0 && this.activityTracker.charactersDeleted > 100 && ratio < addDeleteRatioThreshold) {
+                activeAlertCount++;
                 this.statusBar.showTemporaryWarning("High Deletion Rate (Stuck?)");
                 this.activityTracker.charactersDeleted = 0;
                 this.activityTracker.charactersAdded = 0;
@@ -93,6 +100,7 @@ export class CognitiveLoadTracker {
             const timeReadingMs = this.activityTracker.getTimeSinceLastWriteMs();
             if (this.activityTracker.isScrolling && timeReadingMs > readWriteThresholdMs) {
                 this.isReadWriteWarningActive = true;
+                activeAlertCount++;
                 this.statusBar.showTemporaryWarning("Heavy Reading/Tracing");
                 this.activityTracker.lastWriteTime = Date.now();
             } else {
@@ -102,6 +110,7 @@ export class CognitiveLoadTracker {
 
         // 4. Evaluate Large (AI) Insertions
         if (isInsertionEnabled && this.activityTracker.recentPastedCharacters >= insertionThreshold) {
+            activeAlertCount++;
             this.statusBar.showTemporaryWarning(`Large Code Insertion (${this.activityTracker.recentPastedCharacters} chars) - High Review Load!`);
             this.activityTracker.recentPastedCharacters = 0;
         }

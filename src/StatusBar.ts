@@ -67,10 +67,16 @@ export class StatusBar {
 
     public updateComplexity(score: number) {
         this.complexityScore = score;
-        
+
         if (!this.activeStatusBarWarning) {
-            this.statusBarItem.text = "$(pulse) Flow State: Optimal";
-            this.statusBarItem.backgroundColor = undefined;
+            const complexityThreshold = vscode.workspace.getConfiguration('flow-state').get<number>('complexityThreshold', 15);
+            if (this.isComplexityEnabled && score > complexityThreshold) {
+                this.statusBarItem.text = "$(warning) Flow State: Warning";
+                this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+            } else {
+                this.statusBarItem.text = "$(pulse) Flow State: Optimal";
+                this.statusBarItem.backgroundColor = undefined;
+            }
         }
 
         this.updateHoverPopup();

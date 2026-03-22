@@ -7,6 +7,7 @@ import { ActivityTracker } from './features/ActivityTracker';
 import { ReviewerTracker } from './features/ReviewerTracker';
 import { ContextSwitchManager } from "./contextSwitch";
 import { Dashboard } from './Dashboard';
+import { InactiveTabsManager } from './inactiveTabs';
 
 function handleOnboarding(context: vscode.ExtensionContext) {
     const hasSeenOnboarding = context.globalState.get('flowState.hasSeenOnboarding');
@@ -29,6 +30,9 @@ export function activate(context: vscode.ExtensionContext) {
     const developerCognitiveLoadTracker = new CognitiveLoadTracker(flowStateStatusBar, activityTracker);
     const pomodoroTimer = new PomodoroTimer(developerCognitiveLoadTracker);
     const contextSwitchManager = new ContextSwitchManager();
+
+    const inactiveTabsManager = new InactiveTabsManager();
+
 
     // Initialize the Reviewer Tracker
     const reviewerTracker = new ReviewerTracker(flowStateStatusBar);
@@ -103,13 +107,16 @@ export function activate(context: vscode.ExtensionContext) {
         pomodoroTimer.stop();
     });
 
-    // Add all disposables to subscriptions
+    // Add all disposables to subscriptions	const inactiveTabsManager = new InactiveTabsManager();
+
     context.subscriptions.push(
         flowStateStatusBar,
         pomodoroTimer,
         contextSwitchManager,
         outputChannel,
         dashboardDisposable,
+        contextSwitchManager,
+        inactiveTabsManager,
         analyzePrDisposable,
         editorChangeDisposable,
         documentChangeDisposable,
