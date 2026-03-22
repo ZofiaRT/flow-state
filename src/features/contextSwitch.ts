@@ -1,10 +1,12 @@
 import * as vscode from "vscode";
 import * as path from "path";
 
-const WINDOW_DURATION = 10 * 60 * 1000;
-const SWITCH_THRESHOLD = 8;
+import { StatusBar } from "../StatusBar";
 
-const SNOOZE_DURATION = 5 * 60 * 1000;
+const WINDOW_DURATION = 60 * 1000; //10 * 60 * 1000
+const SWITCH_THRESHOLD = 2; //8
+
+//const SNOOZE_DURATION = 5 * 60 * 1000;
 const DISMISS_COOLDOWN = 1 * 60 * 1000;
 
 const FILE_SWITCH_WEIGHT = 1;
@@ -24,7 +26,10 @@ export class ContextSwitchManager implements vscode.Disposable {
 
   private isShowingWarning = false;
 
-  constructor() {
+  private statusBar: StatusBar;
+
+  constructor(statusBar: StatusBar) {
+    this.statusBar = statusBar;
     this.listener = vscode.window.onDidChangeActiveTextEditor((editor) =>
       this.handleEditorChange(editor),
     );
@@ -84,7 +89,7 @@ export class ContextSwitchManager implements vscode.Disposable {
    * Handles showing the context-switch warning and managing cooldowns.
    * - Snooze: suppresses the warning for 5 min;
    * - Dismissed: applies a short 1-min cooldown;
-   */
+   
   private async showWarning() {
     this.isShowingWarning = true;
 
@@ -106,6 +111,29 @@ export class ContextSwitchManager implements vscode.Disposable {
 
     this.switchEvents = [];
     console.log("[flow-state] Dismissed: 1 minute cooldown");
+
+    setTimeout(() => {
+      this.isShowingWarning = false;
+    }, DISMISS_COOLDOWN);
+  }
+
+  dispose() {
+    this.listener.dispose();
+  }
+}
+  */
+ private async showWarning() {
+    this.isShowingWarning = true;
+
+    const now = Date.now();
+    this.cooldownExpiresAt = now + DISMISS_COOLDOWN;
+
+    // Send warning to status bar only
+    const message = "Frequent context switching detected! Try focusing on one task.";
+    this.statusBar.showTemporaryWarning(message);
+
+    this.switchEvents = [];
+    console.log("[flow-state] Context switch warning triggered (status bar only)");
 
     setTimeout(() => {
       this.isShowingWarning = false;
