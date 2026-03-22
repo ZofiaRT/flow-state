@@ -28,12 +28,22 @@ function render(data) {
     // Overall badge
     const badge = document.getElementById('overall-badge');
     badge.className = `badge ${data.overallStatus}`;
-    badge.textContent = data.overallStatus === 'warning' ? '⚠ Heads Up' : '✓ Optimal';
+    badge.textContent = data.overallStatus === 'warning' ? '⚠ Warning' : '✓ Optimal';
+
+    // Active warning banner
+    const banner = document.getElementById('active-warning');
+    if (data.activeWarning) {
+        banner.textContent = `⚠ ${data.activeWarning}`;
+        banner.className = 'warning-banner';
+    } else {
+        banner.textContent = '✓ No active alerts';
+        banner.className = 'warning-banner clear';
+    }
 
     // Cards
-    setCard('adddelete', data.addDeleteStatus,
-        data.addDeleteRatio,
-        `${data.charsAdded} added · ${data.charsDeleted} deleted · threshold: ${data.addDeleteRatio}`
+    setCard('complexity', data.complexityStatus,
+        String(data.complexityScore),
+        `Threshold: ${data.complexityThreshold}`
     );
 
     setCard('readwrite', data.readWriteStatus,

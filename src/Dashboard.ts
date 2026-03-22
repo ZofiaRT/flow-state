@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ActivityTracker } from './features/ActivityTracker';
+import { CognitiveLoadTracker } from './features/DeveloperCognitiveLoadTracker';
+import { StatusBar } from './StatusBar';
 import { getNonce } from './utils';
 
 const REFRESH_INTERVAL_MS = 1000; // Refrehs interval for the dashboard metrics
@@ -12,17 +14,19 @@ export class Dashboard {
     private readonly disposables: vscode.Disposable[] = [];
     private updateInterval: NodeJS.Timeout | undefined;
 
-    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, activityTracker: ActivityTracker) {
+    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, tracker: CognitiveLoadTracker, activityTracker: ActivityTracker, statusBar: StatusBar) {
         this.panel = panel;
         this.panel.webview.html = this.buildHtml(extensionUri);
         this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
-        this.updateInterval = setInterval(() => this.postData(activityTracker), REFRESH_INTERVAL_MS);
+        this.updateInterval = setInterval(() => this.postData(tracker, activityTracker, statusBar), REFRESH_INTERVAL_MS);
     }
 
     public static show(
         extensionUri: vscode.Uri,
-        activityTracker: ActivityTracker
+        tracker: CognitiveLoadTracker,
+        activityTracker: ActivityTracker,
+        statusBar: StatusBar
     ) {
         if (Dashboard.currentPanel) {
             Dashboard.currentPanel.panel.reveal(vscode.ViewColumn.One);
@@ -40,35 +44,29 @@ export class Dashboard {
         );
         panel.iconPath = new vscode.ThemeIcon('pulse');
 
-        Dashboard.currentPanel = new Dashboard(panel, extensionUri, activityTracker);
+        Dashboard.currentPanel = new Dashboard(panel, extensionUri, tracker, activityTracker, statusBar);
     }
 
-    public postData(activityTracker: ActivityTracker) {
+    public postData(tracker: CognitiveLoadTracker, activityTracker: ActivityTracker, statusBar: StatusBar) {
         const config = vscode.workspace.getConfiguration('flow-state');
 
-        const addDeleteRatio = activityTracker.getAddDeleteRatio();
-        const ratioThreshold = config.get<number>('addDeleteRatioThreshold', 0.5);
-        const addDeleteStatus =
-            activityTracker.charactersDeleted > 100 && addDeleteRatio < ratioThreshold
-                ? 'warning' : 'good';
+        const readWriteStatus = tracker.isReadWriteWarningActive ? 'warning' : 'good';
 
         const timeSinceWriteMs = activityTracker.getTimeSinceLastWriteMs();
         const readWriteThresholdMs = config.get<number>('readWriteTimeThresholdSeconds', 120) * 1000;
-        const readWriteStatus =
-            activityTracker.isScrolling && timeSinceWriteMs > readWriteThresholdMs
-                ? 'warning' : 'good';
 
-        const overallStatus =
-            addDeleteStatus === 'warning' ||
-                readWriteStatus === 'warning'
-                ? 'warning' : 'good';
+        const complexityThreshold = config.get<number>('complexityThreshold', 15);
+        const complexityScore = tracker.currentComplexityScore;
+        const complexityStatus = complexityScore > complexityThreshold ? 'warning' : 'good';
+
+        const overallStatus = readWriteStatus === 'warning' || complexityStatus === 'warning' ? 'warning' : 'good';
 
         this.panel.webview.postMessage({
             overallStatus,
-            charsAdded: activityTracker.charactersAdded,
-            charsDeleted: activityTracker.charactersDeleted,
-            addDeleteRatio: isFinite(addDeleteRatio) ? addDeleteRatio.toFixed(2) : '∞',
-            addDeleteStatus,
+            activeWarning: statusBar.activeTooltipWarning,
+            complexityScore,
+            complexityThreshold,
+            complexityStatus,
             timeSinceWriteSec: Math.round(timeSinceWriteMs / 1000),
             readWriteThresholdSec: readWriteThresholdMs / 1000,
             readWriteStatus,

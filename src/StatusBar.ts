@@ -15,7 +15,7 @@ export class StatusBar {
     private hasZombieWarning: boolean = false;
 
     private activeStatusBarWarning: string | null = null;
-    private activeTooltipWarning: string | null = null;
+    public activeTooltipWarning: string | null = null;
     
     private statusBarTimeout: NodeJS.Timeout | null = null;
     private tooltipTimeout: NodeJS.Timeout | null = null;
