@@ -4,9 +4,7 @@ import * as path from "path";
 import { StatusBar } from "../StatusBar";
 
 const CHECK_INTERVAL = 60 * 1000; // Check for inactive tabs every 1 min
-const WARNING_INTERVAL = 30 * 60 * 1000; // Notify user every 30 min
-const TAB_INACTIVE_THRESHOLD = 30 * 60 * 1000; // A tab that is not touched for 30 minutes is inactive 
-const TAB_WARNING_THRESHOLD = 8; // minimum inactive tabs before warning
+const TAB_INACTIVE_THRESHOLD = 30 * 60 * 1000; // A tab that is not touched for 30 minutes is inactive 30 * 60 * 1000
 
 /**
  * Monitors all open text editor tabs and periodically warns
@@ -22,11 +20,25 @@ export class InactiveTabsManager implements vscode.Disposable {
 
   private lastWarningTime = 0;
 
+  private warningInterval: number;
+  private tabWarningThreshold: number;
+
   constructor(statusBar: StatusBar) {
+    const config = vscode.workspace.getConfiguration("flowState");
+
+    // Pull configurable values from settings
+    this.warningInterval = config.get<number>("warningTabActivityInterval", 30 * 60 * 1000);
+    this.tabWarningThreshold = config.get<number>("tabActivityWarningThreshold", 8);
+
+    const enabled = config.get<boolean>("enableInactiveTabWarnings", true);
+    if (!enabled) {
+        // Either throw or skip creating this instance entirely
+        throw new Error("InactiveTabsManager is disabled via settings");
+    }
+    
+    this.statusBar = statusBar;
     // Record all tabs that are already open when the manager is first created
     this.seedTabs();
-
-    this.statusBar = statusBar;
 
     this.disposables.push(
       vscode.window.onDidChangeActiveTextEditor((editor) => {
@@ -82,13 +94,13 @@ export class InactiveTabsManager implements vscode.Disposable {
 
     const now = Date.now();
 
-    if (now - this.lastWarningTime < WARNING_INTERVAL) {
+    if (now - this.lastWarningTime < this.warningInterval) {
       return;
     }
 
     const inactiveTabs = this.getInactiveTabs();
 
-    if (inactiveTabs.length < TAB_WARNING_THRESHOLD) {
+    if (inactiveTabs.length < this.tabWarningThreshold) {
       return;
     }
 
@@ -127,7 +139,7 @@ export class InactiveTabsManager implements vscode.Disposable {
       placeHolder: "Select tabs to close",
     });
 
-    if (!picks) return;
+    if (!picks) { return; };
 
     const tabsToClose = picks.map((p) => p.tab);
     vscode.window.tabGroups.close(tabsToClose);

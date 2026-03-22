@@ -133,6 +133,21 @@
           "type": "number",
           "default": 400,
           "description": "The maximum number of modified Lines of Code (LOC) allowed in a PR before triggering a Reviewer Fatigue warning."
+        },
+          "flowState.enableTabActivityTracker": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable the tab activity tracker feature."
+        },
+        "flowState.warningTabActivityInterval": {
+          "type": "number",
+          "default": 1800, 
+          "description": "Time in seconds between inactive tabs warnings."
+        },
+        "flowState.tabActivityWarningThreshold": {
+          "type": "number",
+          "default": 8,
+          "description": "Number of inactive tabs before a warning is shown."
         }
       }
     }
