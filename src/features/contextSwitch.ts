@@ -3,8 +3,8 @@ import * as path from "path";
 
 import { StatusBar } from "../StatusBar";
 
-const WINDOW_DURATION = 60 * 1000; //10 * 60 * 1000
-const SWITCH_THRESHOLD = 2; //8
+const WINDOW_DURATION = 10 * 60 * 1000; 
+const SWITCH_THRESHOLD = 8; 
 
 //const SNOOZE_DURATION = 5 * 60 * 1000;
 const DISMISS_COOLDOWN = 1 * 60 * 1000;
@@ -109,44 +109,7 @@ export class ContextSwitchManager implements vscode.Disposable {
       this.showWarning();
     }
   }
-
-  /**
-   * Handles showing the context-switch warning and managing cooldowns.
-   * - Snooze: suppresses the warning for 5 min;
-   * - Dismissed: applies a short 1-min cooldown;
-   
-  private async showWarning() {
-    this.isShowingWarning = true;
-
-    const now = Date.now();
-
-    this.cooldownExpiresAt = now + DISMISS_COOLDOWN;
-
-    vscode.window
-      .showWarningMessage(
-        "Frequent context switching detected! Try focusing on one task.",
-        "Snooze",
-      )
-      .then((selection) => {
-        if (selection === "Snooze") {
-          this.cooldownExpiresAt = Date.now() + SNOOZE_DURATION;
-          console.log("[flow-state] Snoozed 5 minutes");
-        }
-      });
-
-    this.switchEvents = [];
-    console.log("[flow-state] Dismissed: 1 minute cooldown");
-
-    setTimeout(() => {
-      this.isShowingWarning = false;
-    }, DISMISS_COOLDOWN);
-  }
-
-  dispose() {
-    this.listener.dispose();
-  }
-}
-  */
+  
   private async showWarning() {
     this.isShowingWarning = true;
 
