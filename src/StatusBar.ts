@@ -147,13 +147,12 @@ export class StatusBar {
                         suggestion = "\n\n> **Suggestion:** Pasting large blocks of generated code introduces 'Comprehension Debt'. Take a moment to read and fully understand this logic before continuing.";
                         break;
                 }
-                tooltip.appendMarkdown(`* ${currentWarning}${suggestion}\n\n`);
+                tooltip.appendMarkdown(`* **${currentWarning}**${suggestion}\n\n`);
             }
             if (hasComplexityWarning) {
                 tooltip.appendMarkdown(`* **High Code Complexity (Score: ${this.complexityScore})**\n\n`);
             }
         } else {
-            tooltip.appendMarkdown(`#### Active Alerts\n\n`);
             tooltip.appendMarkdown(`* $(check) Optimal\n\n`);
         }
 
