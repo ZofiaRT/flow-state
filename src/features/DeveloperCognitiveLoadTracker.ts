@@ -81,7 +81,8 @@ export class CognitiveLoadTracker {
         if (isAddDeleteEnabled) {
             const ratio = this.activityTracker.getAddDeleteRatio();
             if (this.activityTracker.charactersAdded > 0 && this.activityTracker.charactersDeleted > 100 && ratio < addDeleteRatioThreshold) {
-                this.statusBar.showTemporaryWarning("High Deletion Rate (Stuck?)");
+                // Pass 'DELETION' to trigger the walk/reset suggestion
+                this.statusBar.showTemporaryWarning("High Deletion Rate (Feeling Stuck?)", 'DELETION');
                 this.activityTracker.charactersDeleted = 0;
                 this.activityTracker.charactersAdded = 0;
             }
@@ -91,14 +92,16 @@ export class CognitiveLoadTracker {
         if (isReadWriteEnabled) {
             const timeReadingMs = this.activityTracker.getTimeSinceLastWriteMs();
             if (this.activityTracker.isScrolling && timeReadingMs > readWriteThresholdMs) { 
-                this.statusBar.showTemporaryWarning("Heavy Reading/Tracing");
+                // Pass 'READING' to trigger the eye-rest/tracing suggestion
+                this.statusBar.showTemporaryWarning("Heavy Reading and Tracing Detected", 'READING');
                 this.activityTracker.lastWriteTime = Date.now();
             }
         }
 
         // 4. Evaluate Large (AI) Insertions
         if (isInsertionEnabled && this.activityTracker.recentPastedCharacters >= insertionThreshold) {
-            this.statusBar.showTemporaryWarning(`Large Code Insertion (${this.activityTracker.recentPastedCharacters} chars) - High Review Load!`);
+            // Pass 'INSERTION' to trigger the review/comprehension debt suggestion
+            this.statusBar.showTemporaryWarning(`Large Code Insertion (${this.activityTracker.recentPastedCharacters} chars)`, 'INSERTION');
             this.activityTracker.recentPastedCharacters = 0;
         }
 
