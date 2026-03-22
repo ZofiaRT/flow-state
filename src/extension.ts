@@ -5,8 +5,8 @@ import { StatusBar } from './StatusBar';
 import { checkZombiePackages } from './zombiePackages';
 import { ActivityTracker } from './features/ActivityTracker';
 import { ReviewerTracker } from './features/ReviewerTracker';
-import { ContextSwitchManager } from "./contextSwitch";
-import { InactiveTabsManager } from './inactiveTabs';
+import { ContextSwitchManager } from "./features/contextSwitch";
+import { InactiveTabsManager } from './features/inactiveTabs';
 
 function handleOnboarding(context: vscode.ExtensionContext) {
     const hasSeenOnboarding = context.globalState.get('flowState.hasSeenOnboarding');
@@ -29,7 +29,15 @@ export function activate(context: vscode.ExtensionContext) {
     const developerCognitiveLoadTracker = new CognitiveLoadTracker(flowStateStatusBar, activityTracker);
     const pomodoroTimer = new PomodoroTimer(developerCognitiveLoadTracker);
     const contextSwitchManager = new ContextSwitchManager();
-    const inactiveTabsManager = new InactiveTabsManager();
+
+    // Registers command to statusbar for reviewing inactive tabs
+    const inactiveTabsManager = new InactiveTabsManager(flowStateStatusBar);
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            "flow-state.reviewInactiveTabs",
+            () => inactiveTabsManager.showInactiveTabsPicker()
+        )
+    );
 
     
     // Initialize the Reviewer Tracker

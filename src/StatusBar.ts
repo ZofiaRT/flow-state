@@ -40,6 +40,11 @@ export class StatusBar {
         this.updateHoverPopup();
     }
 
+    // Sets command for reviewing inactive tavs
+    public setCommand(command: string | undefined) {
+        this.statusBarItem.command = command;
+    }
+
     public updateReviewerStats(enabled: boolean, fileCount: number, loc: number, complexFiles: number, hasZombies: boolean) {
         this.isReviewerEnabled = enabled;
         this.reviewerFileCount = fileCount;
@@ -85,6 +90,7 @@ export class StatusBar {
 
         this.statusBarTimeout = setTimeout(() => {
             this.activeStatusBarWarning = null;
+            this.statusBarItem.command = undefined;
             this.updateComplexity(this.complexityScore);
         }, 5000);
     }

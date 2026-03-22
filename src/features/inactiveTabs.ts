@@ -1,10 +1,12 @@
 import * as vscode from "vscode";
 import * as path from "path";
 
+import { StatusBar } from "../StatusBar";
+
 const CHECK_INTERVAL = 60 * 1000; // Check for inactive tabs every 1 min
 const WARNING_INTERVAL = 30 * 60 * 1000; // Notify user every 30 min
-const TAB_INACTIVE_THRESHOLD = 30 * 60 * 1000; // A tab that is not touched for 30 minutes is inactive
-const TAB_WARNING_THRESHOLD = 5; // minimum inactive tabs before warning
+const TAB_INACTIVE_THRESHOLD = 30 * 60 * 1000; // A tab that is not touched for 30 minutes is inactive 
+const TAB_WARNING_THRESHOLD = 8; // minimum inactive tabs before warning
 
 /**
  * Monitors all open text editor tabs and periodically warns
@@ -16,12 +18,15 @@ export class InactiveTabsManager implements vscode.Disposable {
   private tabLastActive = new Map<string, number>();
   private disposables: vscode.Disposable[] = [];
   private interval: NodeJS.Timeout;
+  private statusBar: StatusBar;
 
   private lastWarningTime = 0;
 
-  constructor() {
+  constructor(statusBar: StatusBar) {
     // Record all tabs that are already open when the manager is first created
     this.seedTabs();
+
+    this.statusBar = statusBar;
 
     this.disposables.push(
       vscode.window.onDidChangeActiveTextEditor((editor) => {
@@ -89,22 +94,15 @@ export class InactiveTabsManager implements vscode.Disposable {
 
     this.lastWarningTime = now;
 
-    vscode.window
-      .showInformationMessage(
-        `${inactiveTabs.length} inactive tabs`,
-        "Review Tabs",
-        "Close Tabs",
-      )
-      .then((selection) => {
-        if (selection === "Review Tabs") {
-          this.showInactiveTabsPicker();
-        } else if (selection === "Close Tabs") {
-          vscode.window.tabGroups.close(inactiveTabs);
-        }
-      });
+    const message = `${inactiveTabs.length} inactive tabs — click to review`;
+
+    this.statusBar.showTemporaryWarning(message);
+
+    // Make status bar clickable
+    this.statusBar.setCommand("flow-state.reviewInactiveTabs");
   }
 
-  private async showInactiveTabsPicker() {
+  public async showInactiveTabsPicker() {
     const inactiveTabs = this.getInactiveTabs();
 
     if (!inactiveTabs.length) {
