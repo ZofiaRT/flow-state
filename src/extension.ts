@@ -42,10 +42,23 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(addTaskCommand, removeTaskCommand);
 
     // Register the tree view in the sidebar
-    vscode.window.createTreeView('todoListView', {
-        treeDataProvider: todoView
+    const treeView = vscode.window.createTreeView('todoListView', {
+        treeDataProvider: todoView,
+        showCollapseAll: false,
+        canSelectMany: false
     });
 
+    treeView.onDidChangeCheckboxState(e => {
+        e.items.forEach(([item, state]) => {
+            if (state === vscode.TreeItemCheckboxState.Checked && !item.isAddTaskButton) {
+                setTimeout(() => {
+                    todoView.removeTask(item.label);
+                }, 500);
+                
+            }
+        });
+    });
+    
     handleOnboarding(context);
 
     // Initialize core features

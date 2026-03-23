@@ -17,24 +17,28 @@ export class TodoView implements vscode.TreeDataProvider<Task> {
 
     getTreeItem(element: Task): vscode.TreeItem {
         const item = new vscode.TreeItem(element.label);
-        
-        // If this is the "Add Task" button
+
         if (element.isAddTaskButton) {
             item.command = {
                 command: 'todo-list.addTask',
                 title: 'Add Task',
             };
-            item.iconPath = new vscode.ThemeIcon('plus'); // Use a plus icon for this button
-            item.contextValue = 'addTaskButton';  // Context value to help identify this item
+            item.iconPath = new vscode.ThemeIcon('add');
+            item.contextValue = 'addTaskButton';
         } else {
             item.contextValue = 'task';
+
+            // ✅ Add checkbox
+            item.checkboxState = vscode.TreeItemCheckboxState.Unchecked;
+
+            // When clicked, remove task
             item.command = {
                 command: 'todo-list.removeTask',
                 title: 'Remove Task',
-                arguments: [element.label]  // Pass the task label for removal
+                arguments: [element.label]
             };
         }
-        
+
         return item;
     }
 

@@ -17,7 +17,8 @@
       "explorer": [
         {
           "id": "todoListView",
-          "name": "To-Do List"
+          "name": "To-Do List",
+          "icon": "$(checklist)"
         }
       ]
     },
