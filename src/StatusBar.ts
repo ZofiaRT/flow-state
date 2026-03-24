@@ -95,9 +95,8 @@ export class StatusBar {
 
         this.activeStatusBarWarning = message; 
         
-        this.statusBarItem.text = `$(pass) ${message}`; // Uses the built-in checkmark icon
-        this.statusBarItem.backgroundColor = undefined; 
-        this.statusBarItem.color = new vscode.ThemeColor('terminal.ansiGreen'); // Makes the text green
+        this.statusBarItem.text = `✨ ${message}`; 
+        this.statusBarItem.backgroundColor = undefined;
         
         this.updateHoverPopup();
 
