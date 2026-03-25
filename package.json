@@ -108,12 +108,12 @@
         },
         "flow-state.readWriteTimeThresholdSeconds": {
           "type": "number",
-          "default": 120,
+          "default": 900,
           "description": "Time in seconds without typing before triggering a 'Heavy Reading' warning within Developer Cognitive Load tracker."
         },
         "flow-state.addDeleteRatioThreshold": {
           "type": "number",
-          "default": 0.5,
+          "default": 0.3,
           "description": "If the ratio of added to deleted characters falls below this value (with high deletion count), trigger a 'Stuck' warning within Developer Cognitive Load tracker."
         },
         "flow-state.enableLargeInsertionTracking": {
@@ -135,6 +135,21 @@
           "type": "number",
           "default": 400,
           "description": "The maximum number of modified Lines of Code (LOC) allowed in a PR before triggering a Reviewer Fatigue warning."
+        },
+        "flow-state.contextSwitch.enabled": {
+        "type": "boolean",
+        "default": true,
+        "description": "Enable context switch tracking."
+        },
+        "flow-state.contextSwitch.switchThreshold": {
+          "type": "number",
+          "default": 8,
+          "description": "Number of context switches before warning."
+        },
+        "flow-state.contextSwitch.windowDuration": {
+          "type": "number",
+          "default": 600000,
+          "description": "Time window for counting context switches (ms)."
         }
       }
     }

@@ -42,8 +42,8 @@ export class CognitiveLoadTracker {
         const isReadWriteEnabled = config.get<boolean>('enableReadWriteTracking', true);
         const isAddDeleteEnabled = config.get<boolean>('enableAddDeleteTracking', true);
         const complexityThreshold = config.get<number>('complexityThreshold', 15);
-        const readWriteThresholdMs = config.get<number>('readWriteTimeThresholdSeconds', 120) * 1000;
-        const addDeleteRatioThreshold = config.get<number>('addDeleteRatioThreshold', 0.5);
+        const readWriteThresholdMs = config.get<number>('readWriteTimeThresholdSeconds', 900) * 1000;
+        const addDeleteRatioThreshold = config.get<number>('addDeleteRatioThreshold', 0.3);
 
         const isInsertionEnabled = config.get<boolean>('enableLargeInsertionTracking', true);
         const insertionThreshold = config.get<number>('largeInsertionThresholdChars', 600);
