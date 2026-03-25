@@ -51,6 +51,41 @@ function render(data) {
         `Alert threshold: ${data.readWriteThresholdSec}s of heavy reading`
     );
 
+    setCard('contextswitch', data.contextSwitchStatus,
+        `${data.contextSwitchScore} / ${data.contextSwitchThreshold}`,
+        `Switch score since last alert`
+    );
+
+    // Reviewer section
+    const reviewer = data.reviewer;
+    const reviewerSection = document.getElementById('reviewer-section');
+    const reviewerEmpty = document.getElementById('reviewer-empty');
+
+    if (!reviewer.enabled || reviewer.fileCount === 0) {
+        reviewerSection.style.display = 'none';
+        reviewerEmpty.textContent = reviewer.enabled ? 'Use git add to stage your PR and see reviewer load.' : 'Reviewer tracking is disabled.';
+        reviewerEmpty.style.display = '';
+        reviewerEmpty.className = 'warning-banner clear';
+    } else {
+        reviewerSection.style.display = '';
+        reviewerEmpty.style.display = 'none';
+
+        const locStatus = reviewer.loc > data.locThreshold ? 'warning' : 'good';
+        const complexStatus = reviewer.complexFiles > 0 ? 'warning' : 'good';
+
+        setCard('reviewer-files', 'good', String(reviewer.fileCount), 'staged files');
+        setCard('reviewer-loc', locStatus, String(reviewer.loc), `Threshold: ${data.locThreshold} lines`);
+        setCard('reviewer-complexity', complexStatus, String(reviewer.complexFiles), `Files above complexity threshold`);
+
+        const zombieBanner = document.getElementById('reviewer-zombie');
+        if (reviewer.hasZombieWarning) {
+            zombieBanner.textContent = '⚠ Potential zombie packages detected in package.json';
+            zombieBanner.className = 'warning-banner';
+        } else {
+            zombieBanner.textContent = '';
+            zombieBanner.className = 'warning-banner clear';
+        }
+    }
 
 }
 

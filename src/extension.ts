@@ -59,7 +59,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     const dashboardDisposable = vscode.commands.registerCommand('flow-state.openDashboard', () => {
-        Dashboard.show(context.extensionUri, developerCognitiveLoadTracker, activityTracker, flowStateStatusBar);
+        Dashboard.show(context.extensionUri, developerCognitiveLoadTracker, activityTracker, flowStateStatusBar, contextSwitchManager);
     });
 
     // Register the Manual PR Check Command

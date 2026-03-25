@@ -4,6 +4,7 @@ import * as path from 'path';
 import { ActivityTracker } from './features/ActivityTracker';
 import { CognitiveLoadTracker } from './features/DeveloperCognitiveLoadTracker';
 import { StatusBar } from './StatusBar';
+import { ContextSwitchManager } from './features/contextSwitch';
 import { getNonce } from './utils';
 
 const REFRESH_INTERVAL_MS = 1000; // Refrehs interval for the dashboard metrics
@@ -14,19 +15,20 @@ export class Dashboard {
     private readonly disposables: vscode.Disposable[] = [];
     private updateInterval: NodeJS.Timeout | undefined;
 
-    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, tracker: CognitiveLoadTracker, activityTracker: ActivityTracker, statusBar: StatusBar) {
+    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, tracker: CognitiveLoadTracker, activityTracker: ActivityTracker, statusBar: StatusBar, contextSwitchManager: ContextSwitchManager) {
         this.panel = panel;
         this.panel.webview.html = this.buildHtml(extensionUri);
         this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
-        this.updateInterval = setInterval(() => this.postData(tracker, activityTracker, statusBar), REFRESH_INTERVAL_MS);
+        this.updateInterval = setInterval(() => this.postData(tracker, activityTracker, statusBar, contextSwitchManager), REFRESH_INTERVAL_MS);
     }
 
     public static show(
         extensionUri: vscode.Uri,
         tracker: CognitiveLoadTracker,
         activityTracker: ActivityTracker,
-        statusBar: StatusBar
+        statusBar: StatusBar,
+        contextSwitchManager: ContextSwitchManager
     ) {
         if (Dashboard.currentPanel) {
             Dashboard.currentPanel.panel.reveal(vscode.ViewColumn.One);
@@ -44,10 +46,10 @@ export class Dashboard {
         );
         panel.iconPath = new vscode.ThemeIcon('pulse');
 
-        Dashboard.currentPanel = new Dashboard(panel, extensionUri, tracker, activityTracker, statusBar);
+        Dashboard.currentPanel = new Dashboard(panel, extensionUri, tracker, activityTracker, statusBar, contextSwitchManager);
     }
 
-    public postData(tracker: CognitiveLoadTracker, activityTracker: ActivityTracker, statusBar: StatusBar) {
+    public postData(tracker: CognitiveLoadTracker, activityTracker: ActivityTracker, statusBar: StatusBar, contextSwitchManager: ContextSwitchManager) {
         const config = vscode.workspace.getConfiguration('flow-state');
 
         const readWriteStatus = tracker.isReadWriteWarningActive ? 'warning' : 'good';
@@ -59,7 +61,15 @@ export class Dashboard {
         const complexityScore = tracker.currentComplexityScore;
         const complexityStatus = complexityScore > complexityThreshold ? 'warning' : 'good';
 
-        const overallStatus = readWriteStatus === 'warning' || complexityStatus === 'warning' ? 'warning' : 'good';
+        const contextSwitchScore = contextSwitchManager.currentScore;
+        const contextSwitchThreshold = contextSwitchManager.threshold;
+        const contextSwitchStatus = contextSwitchScore > contextSwitchThreshold ? 'warning' : 'good';
+
+        const reviewer = statusBar.reviewer;
+        const locThreshold = config.get<number>('reviewerLocThreshold', 400);
+        const reviewerStatus = reviewer.enabled && (reviewer.loc > locThreshold || reviewer.complexFiles > 0 || reviewer.hasZombieWarning) ? 'warning' : 'good';
+
+        const overallStatus = readWriteStatus === 'warning' || complexityStatus === 'warning' || contextSwitchStatus === 'warning' || reviewerStatus === 'warning' ? 'warning' : 'good';
 
         this.panel.webview.postMessage({
             overallStatus,
@@ -70,6 +80,12 @@ export class Dashboard {
             timeSinceWriteSec: Math.round(timeSinceWriteMs / 1000),
             readWriteThresholdSec: readWriteThresholdMs / 1000,
             readWriteStatus,
+            contextSwitchScore,
+            contextSwitchThreshold,
+            contextSwitchStatus,
+            reviewer,
+            locThreshold,
+            reviewerStatus,
         });
     }
 

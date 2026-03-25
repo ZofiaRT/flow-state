@@ -32,6 +32,16 @@ export class ContextSwitchManager implements vscode.Disposable {
   private switchThreshold: number = SWITCH_THRESHOLD;
   private windowDuration: number = WINDOW_DURATION;
 
+  public get currentScore(): number {
+    const now = Date.now();
+    const recent = this.switchEvents.filter(e => now - e.time < this.windowDuration);
+    return recent.reduce((sum, e) => sum + e.weight, 0);
+  }
+
+  public get threshold(): number {
+    return this.switchThreshold;
+  }
+
   constructor(statusBar: StatusBar) {
     this.statusBar = statusBar;
     this.updateConfig();
