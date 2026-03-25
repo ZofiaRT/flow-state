@@ -62,6 +62,30 @@
             }
           },
           {
+            "id": "flowState.pomodoro",
+            "title": "Stay Focused with Pomodoro",
+            "description": "Use the built-in Pomodoro timer to work in focused intervals and take regular breaks.",
+            "media": {
+              "markdown": "walkthroughs/pomodoro.md"
+            }
+          },
+          {
+            "id": "flowState.inactiveTabs",
+            "title": "Reduce Tab Clutter",
+            "description": "Identify inactive tabs and easily select which ones to close to keep your workspace clean.",
+            "media": {
+              "markdown": "walkthroughs/inactive-tabs.md"
+            }
+          },
+          {
+            "id": "flowState.dashboard",
+            "title": "View Your Flow-State Dashboard",
+            "description": "Check your activity and cognitive load trends on your personal dashboard.",
+            "media": {
+              "markdown": "walkthroughs/dashboard.md"
+            }
+          },
+          {
             "id": "flowState.settings",
             "title": "Customize Your Experience",
             "description": "Flow-State has a lot of features, but you don't have to use them all at once! Tailor it to fit your workflow.",
