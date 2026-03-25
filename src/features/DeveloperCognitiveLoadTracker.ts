@@ -41,8 +41,8 @@ export class CognitiveLoadTracker {
         const isReadWriteEnabled = config.get<boolean>('enableReadWriteTracking', true);
         const isAddDeleteEnabled = config.get<boolean>('enableAddDeleteTracking', true);
         const complexityThreshold = config.get<number>('complexityThreshold', 15);
-        const readWriteThresholdMs = config.get<number>('readWriteTimeThresholdSeconds', 120) * 1000;
-        const addDeleteRatioThreshold = config.get<number>('addDeleteRatioThreshold', 0.5);
+        const readWriteThresholdMs = config.get<number>('readWriteTimeThresholdSeconds', 900) * 1000;
+        const addDeleteRatioThreshold = config.get<number>('addDeleteRatioThreshold', 0.3);
 
         const isInsertionEnabled = config.get<boolean>('enableLargeInsertionTracking', true);
         const insertionThreshold = config.get<number>('largeInsertionThresholdChars', 600);
@@ -77,12 +77,18 @@ export class CognitiveLoadTracker {
             }
         }
 
+        let activeAlertCount = 0;
+
+        if (isComplexityEnabled && this.currentComplexityScore > complexityThreshold) {
+            activeAlertCount++;
+        }
+
         // 2. Evaluate Add-Delete Ratio
         if (isAddDeleteEnabled) {
             const ratio = this.activityTracker.getAddDeleteRatio();
             if (this.activityTracker.charactersAdded > 0 && this.activityTracker.charactersDeleted > 100 && ratio < addDeleteRatioThreshold) {
-                // Pass 'DELETION' to trigger the walk/reset suggestion
-                this.statusBar.showTemporaryWarning("High Deletion Rate (Feeling Stuck?)", 'DELETION');
+                activeAlertCount++;
+                this.statusBar.showTemporaryWarning("High Deletion Rate (Stuck?)", 'DELETION');
                 this.activityTracker.charactersDeleted = 0;
                 this.activityTracker.charactersAdded = 0;
             }
