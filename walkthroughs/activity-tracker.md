@@ -1,7 +1,9 @@
 # Activity & Context Switching
 
-Constantly bouncing between files destroys your momentum. Flow-State keeps track of your **Context Switching** to help you maintain deep focus.
+Flow-State monitors your coding rhythm to help you maintain deep focus. 
 
-By monitoring how often you switch tabs and measuring your active typing versus idle time, Flow-State helps you build healthier coding habits. 
+Alongside tracking your cognitive load (**typing vs. reading, add/delete ratios, and large code insertions**), Flow-State also monitors your **Context Switching**.
 
-If you find yourself frantically switching between 10 different files, take a breath! Your status bar will reflect your current activity metrics.
+Constantly bouncing between files destroys momentum and increases mental fatigue. Flow-State tracks how often you switch tabs to keep you grounded.
+
+If you're frantically jumping between files, your status bar metrics will gently remind you to take a breath and tackle one task at a time!
