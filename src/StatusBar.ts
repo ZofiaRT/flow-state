@@ -144,13 +144,13 @@ export class StatusBar {
                 // Use the Message Type logic to provide non-brittle suggestions
                 switch (this.activeWarningType) {
                     case 'DELETION':
-                        suggestion = "\n\n> **Suggestion:** Significant deletions detected. Take a walk to reset your mind; the solution often appears when you step away.";
+                        suggestion = "\n\n> **Suggestion:** 🚶‍♂️ Taking a quick walk can work wonders when you're feeling stuck!";
                         break;
                     case 'READING':
-                        suggestion = "\n\n> **Suggestion:** Tracing complex code is mentally taxing. Consider a short break or drawing the logic on paper.";
+                        suggestion = "\n\n> **Suggestion:** 🧠 Tracing code is tiring! Give your eyes a rest or try sketching the logic on paper.";
                         break;
                     case 'INSERTION':
-                        suggestion = "\n\n> **Suggestion:** Pasting large blocks of generated code introduces 'Comprehension Debt'. Take a moment to read and fully understand this logic before continuing.";
+                        suggestion = "\n\n> **Suggestion:** ⏸️ Pasting lots of code? Take a quick breather to review it line-by-line before moving on.";
                         break;
                 }
                 tooltip.appendMarkdown(`* **${currentWarning}**${suggestion}\n\n`);
@@ -183,7 +183,7 @@ export class StatusBar {
             tooltip.appendMarkdown(`* **Lines Modified:** ${this.reviewerLoc} ${locIcon}\n\n`);
             
             if (this.reviewerLoc > locLimit) {
-                tooltip.appendMarkdown(`> **Suggestion:** Consider splitting this into smaller PRs to prevent reviewer fatigue.\n\n`);
+                tooltip.appendMarkdown(`> **Suggestion:** 📚 This PR is getting large! Consider breaking it down into smaller, **stacked PRs** to keep it easy to review.\n\n`);
             }
 
             const compIcon = this.reviewerComplexityFiles > 0 ? '$(warning) *Reviewer Fatigue Risk!*' : '$(check)';
@@ -194,14 +194,22 @@ export class StatusBar {
                 this.complexFilesList.slice(0, 3).forEach(f => {
                     tooltip.appendMarkdown(`  - \`${f.name}\` (Score: **${f.score}**)\n`);
                 });
-                tooltip.appendMarkdown(`> **Suggestion:** Consider refactoring these complex files into smaller, more readable functions.\n\n`);
+                tooltip.appendMarkdown(`> **Suggestion:** 🛠️ These files are quite complex. Maybe extract some logic into smaller helper functions?\n\n`);
             }
 
             // Zombie Dependencies
             if (this.zombieNames.length > 0) {
-                tooltip.appendMarkdown(`$(warning) **Unused Dependencies Found:**\n`);
-                this.zombieNames.forEach(z => tooltip.appendMarkdown(`  - \`${z}\`\n`));
-                tooltip.appendMarkdown(`> **Suggestion:** Please remove these from \`package.json\` before submitting to keep the project clean.\n\n`);
+                tooltip.appendMarkdown(`$(warning) **Unused Dependencies Found:**\n\n`);
+                const displayLimit = 3; // Show only the first 3 to keep it clean
+                const shownZombies = this.zombieNames.slice(0, displayLimit).map(z => `\`${z}\``).join(', ');
+                
+                let zombieText = `  ${shownZombies}`;
+                if (this.zombieNames.length > displayLimit) {
+                    zombieText += `, and ${this.zombieNames.length - displayLimit} more...`;
+                }
+                
+                tooltip.appendMarkdown(`${zombieText}\n\n`);
+                tooltip.appendMarkdown(`> **Suggestion:** 🧹 Don't forget to clean up your \`package.json\` before committing!\n\n`);
             }
         }
 
