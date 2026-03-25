@@ -142,7 +142,7 @@
         "flowState.warningTabActivityInterval": {
           "type": "number",
           "default": 1800, 
-          "description": "Time in seconds between inactive tabs warnings."
+          "description": "Time in ms between inactive tabs warnings."
         },
         "flowState.tabActivityWarningThreshold": {
           "type": "number",

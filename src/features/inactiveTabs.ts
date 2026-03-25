@@ -3,8 +3,8 @@ import * as path from "path";
 
 import { StatusBar } from "../StatusBar";
 
-const CHECK_INTERVAL = 60 * 1000; // Check for inactive tabs every 1 min
-const TAB_INACTIVE_THRESHOLD = 30 * 60 * 1000; // A tab that is not touched for 30 minutes is inactive 30 * 60 * 1000
+const CHECK_INTERVAL = 10000; // Check for inactive tabs every 1 min
+const TAB_INACTIVE_THRESHOLD = 10000; // A tab that is not touched for 30 minutes is inactive 30 * 60 * 1000
 
 /**
  * Monitors all open text editor tabs and periodically warns
@@ -20,21 +20,18 @@ export class InactiveTabsManager implements vscode.Disposable {
 
   private lastWarningTime = 0;
 
+  private isEnabled: boolean = true;
   private warningInterval: number;
   private tabWarningThreshold: number;
+  
 
   constructor(statusBar: StatusBar) {
-    const config = vscode.workspace.getConfiguration("flowState");
+    const config = vscode.workspace.getConfiguration("flow-state");
 
     // Pull configurable values from settings
+    this.isEnabled = config.get<boolean>("enableInactiveTabWarnings", true);
     this.warningInterval = config.get<number>("warningTabActivityInterval", 30 * 60 * 1000);
     this.tabWarningThreshold = config.get<number>("tabActivityWarningThreshold", 8);
-
-    const enabled = config.get<boolean>("enableInactiveTabWarnings", true);
-    if (!enabled) {
-        // Either throw or skip creating this instance entirely
-        throw new Error("InactiveTabsManager is disabled via settings");
-    }
     
     this.statusBar = statusBar;
     // Record all tabs that are already open when the manager is first created
@@ -87,6 +84,10 @@ export class InactiveTabsManager implements vscode.Disposable {
   }
 
   private checkInactiveTabs() {
+    if (!this.isEnabled) {
+      return;
+    }
+
     const editor = vscode.window.activeTextEditor;
     if (editor) {
       this.markActive(editor.document.uri.toString());

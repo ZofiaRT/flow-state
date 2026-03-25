@@ -32,14 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Registers command to statusbar for reviewing inactive tabs
     const inactiveTabsManager = new InactiveTabsManager(flowStateStatusBar);
-    context.subscriptions.push(
-        vscode.commands.registerCommand(
-            "flow-state.reviewInactiveTabs",
-            () => inactiveTabsManager.showInactiveTabsPicker()
-        )
-    );
-
-    
+  
     // Initialize the Reviewer Tracker
     const reviewerTracker = new ReviewerTracker(flowStateStatusBar);
 
@@ -109,15 +102,15 @@ export function activate(context: vscode.ExtensionContext) {
         pomodoroTimer.stop();
     });
 
-    // Add all disposables to subscriptions	const inactiveTabsManager = new InactiveTabsManager();
+    const reviewTabsDisposable = vscode.commands.registerCommand( "flow-state.reviewInactiveTabs", () => {
+        inactiveTabsManager.showInactiveTabsPicker();
+    });
 
     context.subscriptions.push(
         flowStateStatusBar,
         pomodoroTimer,
         contextSwitchManager,
         outputChannel,
-        zombieDisposable,
-		contextSwitchManager,
 		inactiveTabsManager,
         analyzePrDisposable,
         editorChangeDisposable,
@@ -127,7 +120,8 @@ export function activate(context: vscode.ExtensionContext) {
         startPomodoroDisposable,
         pausePomodoroDisposable,
         resumePomodoroDisposable,
-        stopPomodoroDisposable
+        stopPomodoroDisposable,
+        reviewTabsDisposable
     );
 }
 
