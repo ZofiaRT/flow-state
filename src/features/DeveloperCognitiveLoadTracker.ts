@@ -41,8 +41,8 @@ export class CognitiveLoadTracker {
         const isReadWriteEnabled = config.get<boolean>('enableReadWriteTracking', true);
         const isAddDeleteEnabled = config.get<boolean>('enableAddDeleteTracking', true);
         const complexityThreshold = config.get<number>('complexityThreshold', 15);
-        const readWriteThresholdMs = config.get<number>('readWriteTimeThresholdSeconds', 120) * 1000;
-        const addDeleteRatioThreshold = config.get<number>('addDeleteRatioThreshold', 0.5);
+        const readWriteThresholdMs = config.get<number>('readWriteTimeThresholdSeconds', 900) * 1000;
+        const addDeleteRatioThreshold = config.get<number>('addDeleteRatioThreshold', 0.3);
 
         const isInsertionEnabled = config.get<boolean>('enableLargeInsertionTracking', true);
         const insertionThreshold = config.get<number>('largeInsertionThresholdChars', 600);
@@ -77,10 +77,17 @@ export class CognitiveLoadTracker {
             }
         }
 
+        let activeAlertCount = 0;
+
+        if (isComplexityEnabled && this.currentComplexityScore > complexityThreshold) {
+            activeAlertCount++;
+        }
+
         // 2. Evaluate Add-Delete Ratio
         if (isAddDeleteEnabled) {
             const ratio = this.activityTracker.getAddDeleteRatio();
             if (this.activityTracker.charactersAdded > 0 && this.activityTracker.charactersDeleted > 100 && ratio < addDeleteRatioThreshold) {
+                activeAlertCount++;
                 this.statusBar.showTemporaryWarning("High Deletion Rate (Stuck?)");
                 this.activityTracker.charactersDeleted = 0;
                 this.activityTracker.charactersAdded = 0;
@@ -90,7 +97,8 @@ export class CognitiveLoadTracker {
         // 3. Evaluate Read-Write Ratio
         if (isReadWriteEnabled) {
             const timeReadingMs = this.activityTracker.getTimeSinceLastWriteMs();
-            if (this.activityTracker.isScrolling && timeReadingMs > readWriteThresholdMs) { 
+            if (this.activityTracker.isScrolling && timeReadingMs > readWriteThresholdMs) {
+                activeAlertCount++;
                 this.statusBar.showTemporaryWarning("Heavy Reading/Tracing");
                 this.activityTracker.lastWriteTime = Date.now();
             }
@@ -98,6 +106,7 @@ export class CognitiveLoadTracker {
 
         // 4. Evaluate Large (AI) Insertions
         if (isInsertionEnabled && this.activityTracker.recentPastedCharacters >= insertionThreshold) {
+            activeAlertCount++;
             this.statusBar.showTemporaryWarning(`Large Code Insertion (${this.activityTracker.recentPastedCharacters} chars) - High Review Load!`);
             this.activityTracker.recentPastedCharacters = 0;
         }

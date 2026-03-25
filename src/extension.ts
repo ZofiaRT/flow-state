@@ -28,7 +28,8 @@ export function activate(context: vscode.ExtensionContext) {
     const activityTracker = new ActivityTracker();
     const developerCognitiveLoadTracker = new CognitiveLoadTracker(flowStateStatusBar, activityTracker);
     const pomodoroTimer = new PomodoroTimer(developerCognitiveLoadTracker);
-    const contextSwitchManager = new ContextSwitchManager();
+
+    const contextSwitchManager = new ContextSwitchManager(flowStateStatusBar);
 
     // Registers command to statusbar for reviewing inactive tabs
     const inactiveTabsManager = new InactiveTabsManager(flowStateStatusBar);
