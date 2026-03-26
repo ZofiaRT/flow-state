@@ -31,12 +31,6 @@ export class TodoView implements vscode.TreeDataProvider<Task> {
             // ✅ Add checkbox
             item.checkboxState = vscode.TreeItemCheckboxState.Unchecked;
 
-            // When clicked, remove task
-            item.command = {
-                command: 'todo-list.removeTask',
-                title: 'Remove Task',
-                arguments: [element.label]
-            };
         }
 
         return item;

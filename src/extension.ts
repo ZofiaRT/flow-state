@@ -49,14 +49,11 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     treeView.onDidChangeCheckboxState(e => {
-        e.items.forEach(([item, state]) => {
-            if (state === vscode.TreeItemCheckboxState.Checked && !item.isAddTaskButton) {
-                setTimeout(() => {
-                    todoView.removeTask(item.label);
-                }, 500);
-                
+        for (const [item, state] of e.items) {
+            if (state === vscode.TreeItemCheckboxState.Checked) {
+                todoView.removeTask(item.label);
             }
-        });
+        }
     });
     
     handleOnboarding(context);
