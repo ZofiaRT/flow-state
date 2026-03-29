@@ -88,7 +88,7 @@ export class CognitiveLoadTracker {
             const ratio = this.activityTracker.getAddDeleteRatio();
             if (this.activityTracker.charactersAdded > 0 && this.activityTracker.charactersDeleted > 100 && ratio < addDeleteRatioThreshold) {
                 activeAlertCount++;
-                this.statusBar.showTemporaryWarning("High Deletion Rate (Stuck?)");
+                this.statusBar.showTemporaryWarning("High Deletion Rate (Stuck?)", 'DELETION');
                 this.activityTracker.charactersDeleted = 0;
                 this.activityTracker.charactersAdded = 0;
             }
@@ -97,17 +97,17 @@ export class CognitiveLoadTracker {
         // 3. Evaluate Read-Write Ratio
         if (isReadWriteEnabled) {
             const timeReadingMs = this.activityTracker.getTimeSinceLastWriteMs();
-            if (this.activityTracker.isScrolling && timeReadingMs > readWriteThresholdMs) {
-                activeAlertCount++;
-                this.statusBar.showTemporaryWarning("Heavy Reading/Tracing");
+            if (this.activityTracker.isScrolling && timeReadingMs > readWriteThresholdMs) { 
+                // Pass 'READING' to trigger the eye-rest/tracing suggestion
+                this.statusBar.showTemporaryWarning("Heavy Reading and Tracing Detected", 'READING');
                 this.activityTracker.lastWriteTime = Date.now();
             }
         }
 
         // 4. Evaluate Large (AI) Insertions
         if (isInsertionEnabled && this.activityTracker.recentPastedCharacters >= insertionThreshold) {
-            activeAlertCount++;
-            this.statusBar.showTemporaryWarning(`Large Code Insertion (${this.activityTracker.recentPastedCharacters} chars) - High Review Load!`);
+            // Pass 'INSERTION' to trigger the review/comprehension debt suggestion
+            this.statusBar.showTemporaryWarning(`Large Code Insertion (${this.activityTracker.recentPastedCharacters} chars)`, 'INSERTION');
             this.activityTracker.recentPastedCharacters = 0;
         }
 
