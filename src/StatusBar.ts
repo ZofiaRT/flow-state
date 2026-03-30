@@ -11,6 +11,7 @@ export class StatusBar {
     private reviewerFileCount: number = 0;
     private reviewerLoc: number = 0;
     private reviewerComplexityFiles: number = 0;
+    private hasZombieWarning: boolean = false;
     private zombieNames: string[] = [];
     private complexFilesList: { name: string, score: number }[] = [];
 
