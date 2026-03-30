@@ -99,6 +99,22 @@ export class StatusBar {
         }, 5000);
     }
 
+    public flashSuccessBar(message: string) {
+        if (this.statusBarTimeout) { clearTimeout(this.statusBarTimeout); }
+
+        this.activeStatusBarWarning = message; 
+        
+        this.statusBarItem.text = `✨ ${message}`; 
+        this.statusBarItem.backgroundColor = undefined;
+        
+        this.updateHoverPopup();
+
+        this.statusBarTimeout = setTimeout(() => {
+            this.activeStatusBarWarning = null;
+            this.updateComplexity(this.complexityScore);
+        }, 5000);
+    }
+
     public showTemporaryWarning(message: string, type?: 'DELETION' | 'READING' | 'INSERTION') {
         this.flashStatusBar(message); 
 

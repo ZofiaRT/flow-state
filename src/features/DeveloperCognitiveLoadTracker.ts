@@ -63,10 +63,11 @@ export class CognitiveLoadTracker {
                 const documentText = editor.document.getText();
                 this.currentComplexityScore = calculateCognitiveComplexity(documentText);
                 
-                if (this.currentComplexityScore > complexityThreshold) {
-                    if (this.currentComplexityScore > this.previousComplexityScore) {
-                        this.statusBar.flashStatusBar(`Complexity Increased (Score: ${this.currentComplexityScore})`);
-                    }
+                if (this.currentComplexityScore < this.previousComplexityScore) {
+                    this.statusBar.flashSuccessBar(`Complexity Reduced! (Score: ${this.currentComplexityScore})`);
+                } 
+                else if (this.currentComplexityScore > complexityThreshold && this.currentComplexityScore > this.previousComplexityScore) {
+                    this.statusBar.flashStatusBar(`Complexity Increased (Score: ${this.currentComplexityScore})`);
                 }
                 
                 this.previousComplexityScore = this.currentComplexityScore;
@@ -106,8 +107,9 @@ export class CognitiveLoadTracker {
 
         // 4. Evaluate Large (AI) Insertions
         if (isInsertionEnabled && this.activityTracker.recentPastedCharacters >= insertionThreshold) {
+            activeAlertCount++;
             // Pass 'INSERTION' to trigger the review/comprehension debt suggestion
-            this.statusBar.showTemporaryWarning(`Large Code Insertion (${this.activityTracker.recentPastedCharacters} chars)`, 'INSERTION');
+            this.statusBar.showTemporaryWarning(`Large Code Insertion (${this.activityTracker.recentPastedCharacters} chars) - Context Overload Risk!`, 'INSERTION');
             this.activityTracker.recentPastedCharacters = 0;
         }
 
