@@ -10,13 +10,9 @@
   "categories": [
     "Other"
   ],
-<<<<<<< todoList
-  "activationEvents": ["onStartupFinished", "onCommand:todo-list.showTodoList"],
-=======
   "activationEvents": [
     "onStartupFinished"
   ],
->>>>>>> master
   "main": "./dist/extension.js",
   "contributes": {
     "views": {
@@ -36,23 +32,6 @@
       {
         "command": "flow-state.analyzePR",
         "title": "Flow-State: Analyze PR (Reviewer Load)"
-      },
-      {
-<<<<<<< todoList
-        "command": "todo-list.showTodoList",
-        "title": "Show To-Do List"
-      },
-      {
-        "command": "todo-list.addTask",
-        "title": "Add Task"
-      },
-      {
-        "command": "todo-list.removeTask",
-        "title": "Remove Task"
-=======
-        "command": "flow-state.openDashboard",
-        "title": "Flow-State: Open Dashboard"
->>>>>>> master
       }
     ],
     "walkthroughs": [
@@ -225,7 +204,22 @@
             "type": "number",
             "default": 600000,
             "description": "Time window for counting context switches (ms)."
-          }
+          },
+          "flowState.enableTabActivityTracker": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable the tab activity tracker feature."
+        },
+        "flowState.warningTabActivityInterval": {
+          "type": "number",
+          "default": 1800, 
+          "description": "Time in ms between inactive tabs warnings."
+        },
+        "flowState.tabActivityWarningThreshold": {
+          "type": "number",
+          "default": 8,
+          "description": "Number of inactive tabs before a warning is shown."
+        }
         }
       }
     ]

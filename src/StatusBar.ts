@@ -11,6 +11,7 @@ export class StatusBar {
     private reviewerFileCount: number = 0;
     private reviewerLoc: number = 0;
     private reviewerComplexityFiles: number = 0;
+    private hasZombieWarning: boolean = false;
     private zombieNames: string[] = [];
     private complexFilesList: { name: string, score: number }[] = [];
 
@@ -51,6 +52,11 @@ export class StatusBar {
         this.isMasterEnabled = master;
         this.isComplexityEnabled = complexity;
         this.updateHoverPopup();
+    }
+
+    // Sets command for reviewing inactive tavs
+    public setCommand(command: string | undefined) {
+        this.statusBarItem.command = command;
     }
 
     public updateReviewerStats(enabled: boolean, fileCount: number, loc: number, complexFiles: number, zombies: string[], 
@@ -106,6 +112,7 @@ export class StatusBar {
 
         this.statusBarTimeout = setTimeout(() => {
             this.activeStatusBarWarning = null;
+            this.statusBarItem.command = undefined;
             this.updateComplexity(this.complexityScore);
         }, 5000);
     }
