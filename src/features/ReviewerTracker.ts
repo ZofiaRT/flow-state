@@ -4,7 +4,7 @@ import * as util from 'util';
 import * as path from 'path';
 import { StatusBar } from '../StatusBar';
 import { calculateCognitiveComplexity } from '../utils/complexityCalculator';
-import { getZombieCount } from '../zombiePackages';
+import { getZombieNames } from '../zombiePackages';
 
 const exec = util.promisify(cp.exec);
 
@@ -26,9 +26,10 @@ export class ReviewerTracker {
         const config = vscode.workspace.getConfiguration('flow-state');
         const isEnabled = config.get<boolean>('enableReviewerLoadTracking', true);
         const complexityThreshold = config.get<number>('complexityThreshold', 15);
+        let complexFilesList: { name: string, score: number }[] = []; // Track names and scores
 
         if (!isEnabled) {
-            this.statusBar.updateReviewerStats(false, 0, 0, 0, false);
+            this.statusBar.updateReviewerStats(false, 0, 0, 0, [], []);
             return;
         }
 
@@ -41,7 +42,7 @@ export class ReviewerTracker {
             const { stdout } = await exec('git diff --cached --numstat --relative', { cwd: workspacePath });
             
             if (!stdout || stdout.trim() === '') {
-                this.statusBar.updateReviewerStats(true, 0, 0, 0, false);
+                this.statusBar.updateReviewerStats(true, 0, 0, 0, [], []);
                 return;
             }
 
@@ -49,7 +50,6 @@ export class ReviewerTracker {
             let totalFiles = 0;
             let totalLoc = 0;
             let complexFilesCount = 0;
-            let hasZombieWarning = false;
 
             for (const line of lines) {
                 // git --numstat outputs: "added   deleted   filename" (e.g., "10    2    src/app.ts")
@@ -84,6 +84,8 @@ export class ReviewerTracker {
                         
                         if (score > complexityThreshold) {
                             complexFilesCount++;
+                            // Add the filename and score to our list for detailed suggestions
+                            complexFilesList.push({ name: filePath, score: score });
                         }
                     } catch (err) {
                         console.error(`Flow-State: Could not read file for complexity calculation: ${filePath}`);
@@ -91,19 +93,22 @@ export class ReviewerTracker {
                 }
             }
 
-            // Run the Zombie Package Check once for the whole workspace
-            const actualZombieCount = await getZombieCount(vscode.workspace.workspaceFolders);
-            if (actualZombieCount > 0) {
-                hasZombieWarning = true;
-            }
+            // Fetch the specific names of zombie packages for the tooltip
+            const zombieNames = await getZombieNames(workspaceFolders);
 
-            // Send all the calculated data to the Status Bar UI
-            this.statusBar.updateReviewerStats(true, totalFiles, totalLoc, complexFilesCount, hasZombieWarning);
-
+            // Send all the detailed calculated data to the Status Bar UI
+            this.statusBar.updateReviewerStats(
+                true, 
+                totalFiles, 
+                totalLoc, 
+                complexFilesCount, 
+                zombieNames, 
+                complexFilesList
+            );
         } catch (error) {
             console.error('Flow-State: Failed to run git diff.', error);
-            // If git fails (e.g., not a git repo), default to 0
-            this.statusBar.updateReviewerStats(true, 0, 0, 0, false);
+            // Default to empty stats on error
+            this.statusBar.updateReviewerStats(true, 0, 0, 0, [], []);
         }
     }
 }
