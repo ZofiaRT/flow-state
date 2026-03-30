@@ -10,7 +10,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": ["onStartupFinished"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -21,6 +23,10 @@
       {
         "command": "flow-state.analyzePR",
         "title": "Flow-State: Analyze PR (Reviewer Load)"
+      },
+      {
+        "command": "flow-state.openDashboard",
+        "title": "Flow-State: Open Dashboard"
       }
     ],
     "walkthroughs": [
@@ -59,6 +65,30 @@
             "description": "Track your activity and monitor how often you switch tabs to help you stay focused.",
             "media": {
               "markdown": "walkthroughs/activity-tracker.md"
+            }
+          },
+          {
+            "id": "flowState.pomodoro",
+            "title": "Stay Focused with Pomodoro",
+            "description": "Use the built-in Pomodoro timer to work in focused intervals and take regular breaks.",
+            "media": {
+              "markdown": "walkthroughs/pomodoro.md"
+            }
+          },
+          {
+            "id": "flowState.inactiveTabs",
+            "title": "Reduce Tab Clutter",
+            "description": "Identify inactive tabs and easily select which ones to close to keep your workspace clean.",
+            "media": {
+              "markdown": "walkthroughs/inactive-tabs.md"
+            }
+          },
+          {
+            "id": "flowState.dashboard",
+            "title": "View Your Flow-State Dashboard",
+            "description": "Check your activity and cognitive load trends on your personal dashboard.",
+            "media": {
+              "markdown": "walkthroughs/dashboard.md"
             }
           },
           {
@@ -155,8 +185,107 @@
           "default": true,
           "description": "Enable the Pomodoro timer to automatically adjust focus and break times based on your current cognitive load and activity patterns."
       }
+    "configuration": [
+      {
+        "title": "Flow-State: Cognitive Load (Developer)",
+        "properties": {
+          "flow-state.enableCognitiveLoadTracker": {
+            "order": 1,
+            "type": "boolean",
+            "default": true,
+            "description": "Master Switch: Enable the entire Developer Cognitive Load tracker."
+          },
+          "flow-state.enableCodeComplexity": {
+            "order": 2,
+            "type": "boolean",
+            "default": true,
+            "description": "Enable Code Complexity tracking."
+          },
+          "flow-state.complexityThreshold": {
+            "order": 3,
+            "type": "number",
+            "default": 15,
+            "description": "The maximum allowed cognitive complexity score per file before triggering a warning."
+          },
+          "flow-state.enableReadWriteTracking": {
+            "order": 4,
+            "type": "boolean",
+            "default": true,
+            "description": "Enable Read-Write tracking (detects if you are stuck reading for a long time)."
+          },
+          "flow-state.readWriteTimeThresholdSeconds": {
+            "order": 5,
+            "type": "number",
+            "default": 900,
+            "description": "Time in seconds without typing before triggering a 'Heavy Reading' warning."
+          },
+          "flow-state.enableAddDeleteTracking": {
+            "order": 6,
+            "type": "boolean",
+            "default": true,
+            "description": "Enable Add-Delete ratio tracking (detects heavily deleting code)."
+          },
+          "flow-state.addDeleteRatioThreshold": {
+            "order": 7,
+            "type": "number",
+            "default": 0.3,
+            "description": "Ratio of added to deleted characters before triggering a 'Stuck' warning."
+          },
+          "flow-state.enableLargeInsertionTracking": {
+            "order": 8,
+            "type": "boolean",
+            "default": true,
+            "description": "Enable tracking for massive text insertions (like pasting AI-generated code)."
+          },
+          "flow-state.largeInsertionThresholdChars": {
+            "order": 9,
+            "type": "number",
+            "default": 600,
+            "description": "Number of characters inserted at once that triggers a warning."
+          }
+        }
+      },
+      {
+        "title": "Flow-State: Reviewer Fatigue",
+        "properties": {
+          "flow-state.enableReviewerLoadTracking": {
+            "order": 1,
+            "type": "boolean",
+            "default": true,
+            "description": "Master Switch: Enable tracking for Reviewer Cognitive Load (analyzes staged Git files)."
+          },
+          "flow-state.reviewerLocThreshold": {
+            "order": 2,
+            "type": "number",
+            "default": 400,
+            "description": "The maximum number of modified Lines of Code (LOC) allowed in a PR before warning."
+          }
+        }
+      },
+      {
+        "title": "Flow-State: Context Switching",
+        "properties": {
+          "flow-state.contextSwitch.enabled": {
+            "order": 1,
+            "type": "boolean",
+            "default": true,
+            "description": "Enable context switch tracking."
+          },
+          "flow-state.contextSwitch.switchThreshold": {
+            "order": 2,
+            "type": "number",
+            "default": 8,
+            "description": "Number of context switches before warning."
+          },
+          "flow-state.contextSwitch.windowDuration": {
+            "order": 3,
+            "type": "number",
+            "default": 600000,
+            "description": "Time window for counting context switches (ms)."
+          }
+        }
       }
-    }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
