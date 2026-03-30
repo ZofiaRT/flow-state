@@ -63,11 +63,20 @@ export class CognitiveLoadTracker {
             if (editor) {
                 const documentText = editor.document.getText();
                 this.currentComplexityScore = calculateCognitiveComplexity(documentText);
+<<<<<<< HEAD
 
                 if (this.currentComplexityScore > complexityThreshold) {
                     if (this.currentComplexityScore > this.previousComplexityScore) {
                         this.statusBar.flashStatusBar(`Complexity Increased (Score: ${this.currentComplexityScore})`);
                     }
+=======
+
+                if (this.currentComplexityScore < this.previousComplexityScore) {
+                    this.statusBar.flashSuccessBar(`Complexity Reduced! (Score: ${this.currentComplexityScore})`);
+                }
+                else if (this.currentComplexityScore > complexityThreshold && this.currentComplexityScore > this.previousComplexityScore) {
+                    this.statusBar.flashStatusBar(`Complexity Increased (Score: ${this.currentComplexityScore})`);
+>>>>>>> origin/master
                 }
 
                 this.previousComplexityScore = this.currentComplexityScore;
@@ -89,7 +98,7 @@ export class CognitiveLoadTracker {
             const ratio = this.activityTracker.getAddDeleteRatio();
             if (this.activityTracker.charactersAdded > 0 && this.activityTracker.charactersDeleted > 100 && ratio < addDeleteRatioThreshold) {
                 activeAlertCount++;
-                this.statusBar.showTemporaryWarning("High Deletion Rate (Stuck?)");
+                this.statusBar.showTemporaryWarning("High Deletion Rate (Stuck?)", 'DELETION');
                 this.activityTracker.charactersDeleted = 0;
                 this.activityTracker.charactersAdded = 0;
             }
@@ -101,7 +110,8 @@ export class CognitiveLoadTracker {
             if (this.activityTracker.isScrolling && timeReadingMs > readWriteThresholdMs) {
                 this.isReadWriteWarningActive = true;
                 activeAlertCount++;
-                this.statusBar.showTemporaryWarning("Heavy Reading/Tracing");
+                // Pass 'READING' to trigger the eye-rest/tracing suggestion
+                this.statusBar.showTemporaryWarning("Heavy Reading and Tracing Detected", 'READING');
                 this.activityTracker.lastWriteTime = Date.now();
             } else {
                 this.isReadWriteWarningActive = false;
@@ -111,7 +121,8 @@ export class CognitiveLoadTracker {
         // 4. Evaluate Large (AI) Insertions
         if (isInsertionEnabled && this.activityTracker.recentPastedCharacters >= insertionThreshold) {
             activeAlertCount++;
-            this.statusBar.showTemporaryWarning(`Large Code Insertion (${this.activityTracker.recentPastedCharacters} chars) - High Review Load!`);
+            // Pass 'INSERTION' to trigger the review/comprehension debt suggestion
+            this.statusBar.showTemporaryWarning(`Large Code Insertion (${this.activityTracker.recentPastedCharacters} chars) - Context Overload Risk!`, 'INSERTION');
             this.activityTracker.recentPastedCharacters = 0;
         }
 
