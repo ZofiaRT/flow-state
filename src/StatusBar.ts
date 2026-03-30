@@ -17,7 +17,17 @@ export class StatusBar {
     private activeWarningType: 'DELETION' | 'READING' | 'INSERTION' | null = null;
 
     private activeStatusBarWarning: string | null = null;
-    private activeTooltipWarning: string | null = null;
+    public activeTooltipWarning: string | null = null;
+
+    public get reviewer() {
+        return {
+            enabled: this.isReviewerEnabled,
+            fileCount: this.reviewerFileCount,
+            loc: this.reviewerLoc,
+            complexFiles: this.reviewerComplexityFiles,
+            hasZombieWarning: this.hasZombieWarning,
+        };
+    }
     
     private statusBarTimeout: NodeJS.Timeout | null = null;
     private tooltipTimeout: NodeJS.Timeout | null = null;
@@ -25,7 +35,8 @@ export class StatusBar {
     constructor() {
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
         this.statusBarItem.text = "$(pulse) Flow State: Optimal";
-        
+        this.statusBarItem.command = 'flow-state.openDashboard';
+
         this.updateHoverPopup();
         this.statusBarItem.show();
     }

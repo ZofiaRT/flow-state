@@ -5,6 +5,7 @@ import { calculateCognitiveComplexity } from '../utils/complexityCalculator';
 
 export class CognitiveLoadTracker {
     public currentComplexityScore = 0;
+    public isReadWriteWarningActive = false;
     private previousComplexityScore = 0;
     private statusBar: StatusBar;
     private activityTracker: ActivityTracker;
@@ -23,19 +24,19 @@ export class CognitiveLoadTracker {
     }
 
     public onEditorChanged(editor: vscode.TextEditor | undefined) {
-        this.evaluateCognitiveLoad(); 
+        this.evaluateCognitiveLoad();
     }
 
     public onDocumentChanged(event: vscode.TextDocumentChangeEvent) {
         const activeEditor = vscode.window.activeTextEditor;
         if (activeEditor && event.document === activeEditor.document) {
-            this.evaluateCognitiveLoad(); 
+            this.evaluateCognitiveLoad();
         }
     }
 
     public evaluateCognitiveLoad() {
         const config = vscode.workspace.getConfiguration('flow-state');
-        
+
         const isMasterEnabled = config.get<boolean>('enableCognitiveLoadTracker', true);
         const isComplexityEnabled = config.get<boolean>('enableCodeComplexity', true);
         const isReadWriteEnabled = config.get<boolean>('enableReadWriteTracking', true);
@@ -52,7 +53,7 @@ export class CognitiveLoadTracker {
         if (!isMasterEnabled) {
             this.currentComplexityScore = 0;
             this.previousComplexityScore = 0;
-            this.statusBar.updateComplexity(0); 
+            this.statusBar.updateComplexity(0);
             return;
         }
 
@@ -62,14 +63,14 @@ export class CognitiveLoadTracker {
             if (editor) {
                 const documentText = editor.document.getText();
                 this.currentComplexityScore = calculateCognitiveComplexity(documentText);
-                
+
                 if (this.currentComplexityScore < this.previousComplexityScore) {
                     this.statusBar.flashSuccessBar(`Complexity Reduced! (Score: ${this.currentComplexityScore})`);
-                } 
+                }
                 else if (this.currentComplexityScore > complexityThreshold && this.currentComplexityScore > this.previousComplexityScore) {
                     this.statusBar.flashStatusBar(`Complexity Increased (Score: ${this.currentComplexityScore})`);
                 }
-                
+
                 this.previousComplexityScore = this.currentComplexityScore;
 
             } else {
@@ -98,10 +99,14 @@ export class CognitiveLoadTracker {
         // 3. Evaluate Read-Write Ratio
         if (isReadWriteEnabled) {
             const timeReadingMs = this.activityTracker.getTimeSinceLastWriteMs();
-            if (this.activityTracker.isScrolling && timeReadingMs > readWriteThresholdMs) { 
+            if (this.activityTracker.isScrolling && timeReadingMs > readWriteThresholdMs) {
+                this.isReadWriteWarningActive = true;
+                activeAlertCount++;
                 // Pass 'READING' to trigger the eye-rest/tracing suggestion
                 this.statusBar.showTemporaryWarning("Heavy Reading and Tracing Detected", 'READING');
                 this.activityTracker.lastWriteTime = Date.now();
+            } else {
+                this.isReadWriteWarningActive = false;
             }
         }
 
