@@ -63,20 +63,12 @@ export class CognitiveLoadTracker {
             if (editor) {
                 const documentText = editor.document.getText();
                 this.currentComplexityScore = calculateCognitiveComplexity(documentText);
-<<<<<<< HEAD
-
-                if (this.currentComplexityScore > complexityThreshold) {
-                    if (this.currentComplexityScore > this.previousComplexityScore) {
-                        this.statusBar.flashStatusBar(`Complexity Increased (Score: ${this.currentComplexityScore})`);
-                    }
-=======
 
                 if (this.currentComplexityScore < this.previousComplexityScore) {
                     this.statusBar.flashSuccessBar(`Complexity Reduced! (Score: ${this.currentComplexityScore})`);
                 }
                 else if (this.currentComplexityScore > complexityThreshold && this.currentComplexityScore > this.previousComplexityScore) {
                     this.statusBar.flashStatusBar(`Complexity Increased (Score: ${this.currentComplexityScore})`);
->>>>>>> origin/master
                 }
 
                 this.previousComplexityScore = this.currentComplexityScore;
