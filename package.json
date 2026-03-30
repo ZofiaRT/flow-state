@@ -10,11 +10,24 @@
   "categories": [
     "Other"
   ],
+<<<<<<< todoList
+  "activationEvents": ["onStartupFinished", "onCommand:todo-list.showTodoList"],
+=======
   "activationEvents": [
     "onStartupFinished"
   ],
+>>>>>>> master
   "main": "./dist/extension.js",
   "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "todoListView",
+          "name": "To-Do List",
+          "icon": "$(checklist)"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "flow-state.checkZombiePackages",
@@ -25,8 +38,21 @@
         "title": "Flow-State: Analyze PR (Reviewer Load)"
       },
       {
+<<<<<<< todoList
+        "command": "todo-list.showTodoList",
+        "title": "Show To-Do List"
+      },
+      {
+        "command": "todo-list.addTask",
+        "title": "Add Task"
+      },
+      {
+        "command": "todo-list.removeTask",
+        "title": "Remove Task"
+=======
         "command": "flow-state.openDashboard",
         "title": "Flow-State: Open Dashboard"
+>>>>>>> master
       }
     ],
     "walkthroughs": [
