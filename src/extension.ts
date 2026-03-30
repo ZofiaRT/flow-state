@@ -6,15 +6,17 @@ import { StatusBar } from './StatusBar';
 import { checkZombiePackages } from './zombiePackages';
 import { ActivityTracker } from './features/ActivityTracker';
 import { ReviewerTracker } from './features/ReviewerTracker';
-import { ContextSwitchManager } from "./contextSwitch";
 import * as path from 'path';
+import { Dashboard } from './Dashboard';
+import { ContextSwitchManager } from "./features/contextSwitch";
+import { InactiveTabsManager } from './features/inactiveTabs';
 
 function handleOnboarding(context: vscode.ExtensionContext) {
     const hasSeenOnboarding = context.globalState.get('flowState.hasSeenOnboarding');
     if (!hasSeenOnboarding) {
         const extensionId = context.extension.id;
         const walkthroughId = `${extensionId}#flowState.welcome`;
-        
+
         vscode.commands.executeCommand('workbench.action.openWalkthrough', walkthroughId, false);
         context.globalState.update('flowState.hasSeenOnboarding', true);
     }
@@ -63,21 +65,23 @@ export function activate(context: vscode.ExtensionContext) {
     const activityTracker = new ActivityTracker();
     const developerCognitiveLoadTracker = new CognitiveLoadTracker(flowStateStatusBar, activityTracker);
     const pomodoroTimer = new PomodoroTimer(developerCognitiveLoadTracker);
-    const contextSwitchManager = new ContextSwitchManager();
-    
+    const contextSwitchManager = new ContextSwitchManager(flowStateStatusBar);
+    const inactiveTabsManager = new InactiveTabsManager();
+
+
     // Initialize the Reviewer Tracker
     const reviewerTracker = new ReviewerTracker(flowStateStatusBar);
 
     // Register event listeners
-    const editorChangeDisposable = vscode.window.onDidChangeActiveTextEditor(e => 
+    const editorChangeDisposable = vscode.window.onDidChangeActiveTextEditor(e =>
         developerCognitiveLoadTracker.onEditorChanged(e)
     );
-    
-    const documentChangeDisposable = vscode.workspace.onDidChangeTextDocument(e => { 
+
+    const documentChangeDisposable = vscode.workspace.onDidChangeTextDocument(e => {
         activityTracker.onDocumentChanged(e);
         developerCognitiveLoadTracker.onDocumentChanged(e);
     });
-    
+
     const scrollDisposable = vscode.window.onDidChangeTextEditorVisibleRanges(e => {
         activityTracker.onScrolled(e);
         developerCognitiveLoadTracker.evaluateCognitiveLoad();
@@ -88,6 +92,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     const zombieDisposable = vscode.commands.registerCommand('flow-state.checkZombiePackages', () => {
         checkZombiePackages(outputChannel);
+    });
+
+    const dashboardDisposable = vscode.commands.registerCommand('flow-state.openDashboard', () => {
+        Dashboard.show(context.extensionUri, developerCognitiveLoadTracker, activityTracker, flowStateStatusBar, contextSwitchManager);
     });
 
     // Register the Manual PR Check Command
@@ -101,7 +109,7 @@ export function activate(context: vscode.ExtensionContext) {
     if (gitExtension) {
         gitExtension.activate().then(() => {
             const gitApi = gitExtension.exports.getAPI(1);
-            
+
             // Helper function to attach listener to a repository
             const attachRepoListener = (repo: any) => {
                 repo.state.onDidChange(() => reviewerTracker.analyzePR());
@@ -109,7 +117,7 @@ export function activate(context: vscode.ExtensionContext) {
 
             // Attach to any repos already found
             gitApi.repositories.forEach(attachRepoListener);
-            
+
             // Attach to any repos Git finds in the future (solves the startup bug!)
             gitApi.onDidOpenRepository(attachRepoListener);
         });
@@ -134,13 +142,16 @@ export function activate(context: vscode.ExtensionContext) {
         pomodoroTimer.stop();
     });
 
-    // Add all disposables to subscriptions
+    // Add all disposables to subscriptions	const inactiveTabsManager = new InactiveTabsManager();
+
     context.subscriptions.push(
         flowStateStatusBar,
         pomodoroTimer,
         contextSwitchManager,
         outputChannel,
-        zombieDisposable,
+        dashboardDisposable,
+        contextSwitchManager,
+        inactiveTabsManager,
         analyzePrDisposable,
         editorChangeDisposable,
         documentChangeDisposable,
@@ -153,6 +164,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 }
 
+<<<<<<< todoList
 function getWebviewContent() {
     return `
         <html>
@@ -211,3 +223,6 @@ function getWebviewContent() {
 }
 
 export function deactivate() {}
+=======
+export function deactivate() { }
+>>>>>>> master
