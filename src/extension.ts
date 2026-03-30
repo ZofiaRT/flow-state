@@ -169,65 +169,6 @@ export function activate(context: vscode.ExtensionContext) {
     );
 }
 
-<<<<<<< todoList
-function getWebviewContent() {
-    return `
-        <html>
-            <body>
-                <h1>To-Do List</h1>
-                <ul id="todo-list">
-                    <!-- Dynamic tasks will be listed here -->
-                </ul>
-                <input type="text" id="taskInput" placeholder="Enter a task" />
-                <button id="addTaskButton">Add Task</button>
-
-                <script>
-                    const vscode = acquireVsCodeApi(); // VS Code API for messaging
-
-                    // Function to add a new task
-                    document.getElementById('addTaskButton').addEventListener('click', () => {
-                        const taskInput = document.getElementById('taskInput');
-                        const newTask = taskInput.value;
-                        if (newTask) {
-                            vscode.postMessage({ command: 'add', text: newTask }); // Send the task to the extension
-                            taskInput.value = ''; // Clear input field
-                        }
-                    });
-
-                    // Function to remove a task
-                    function removeTask(index) {
-                        vscode.postMessage({ command: 'remove', index: index }); // Send the index to remove
-                    }
-
-                    // Example: Dynamically update tasks (to be updated by the backend)
-                    function updateTaskList(tasks) {
-                        const list = document.getElementById('todo-list');
-                        list.innerHTML = ''; // Clear the existing list
-                        tasks.forEach((task, index) => {
-                            const li = document.createElement('li');
-                            li.textContent = task;
-                            const removeButton = document.createElement('button');
-                            removeButton.textContent = 'Remove';
-                            removeButton.onclick = () => removeTask(index);
-                            li.appendChild(removeButton);
-                            list.appendChild(li);
-                        });
-                    }
-
-                    // Listen for messages from the extension (to update the task list)
-                    window.addEventListener('message', event => {
-                        const message = event.data;
-                        if (message.command === 'updateTasks') {
-                            updateTaskList(message.tasks);
-                        }
-                    });
-                </script>
-            </body>
-        </html>
-    `;
-}
-
-<<<<<<< todoList
 function getWebviewContent() {
     return `
         <html>
