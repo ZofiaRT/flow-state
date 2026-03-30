@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src {{cspSource}}; script-src 'nonce-{{nonce}}';">
+    <link rel="stylesheet" href="{{styleUri}}">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Flow State Dashboard</h1>
+    <p class="subtitle">Real-time cognitive load metrics for your current session</p>
+
+    <div id="overall-badge" class="badge"></div>
+
+    <p class="section-title">Alerts</p>
+    <div id="active-warning" class="warning-banner clear"></div>
+
+    <p class="section-title metrics-title">Metrics</p>
+    <div class="grid">
+        <div class="card" id="card-complexity">
+            <div class="card-header">
+                <span class="card-title">Code Complexity</span>
+                <span class="card-icon"></span>
+            </div>
+            <div class="card-value" id="val-complexity"></div>
+            <div class="card-detail" id="detail-complexity"></div>
+        </div>
+        <div class="card" id="card-readwrite">
+            <div class="card-header">
+                <span class="card-title">Time Since Last Write</span>
+                <span class="card-icon"></span>
+            </div>
+            <div class="card-value" id="val-readwrite"></div>
+            <div class="card-detail" id="detail-readwrite"></div>
+        </div>
+        <div class="card" id="card-contextswitch">
+            <div class="card-header">
+                <span class="card-title">Context Switches</span>
+                <span class="card-icon"></span>
+            </div>
+            <div class="card-value" id="val-contextswitch"></div>
+            <div class="card-detail" id="detail-contextswitch"></div>
+        </div>
+
+    </div>
+
+    <p class="section-title">Reviewer Load (Staged PR)</p>
+    <div id="reviewer-section">
+        <div class="grid">
+            <div class="card" id="card-reviewer-files">
+                <div class="card-header">
+                    <span class="card-title">Files Staged</span>
+                    <span class="card-icon"></span>
+                </div>
+                <div class="card-value" id="val-reviewer-files"></div>
+                <div class="card-detail" id="detail-reviewer-files"></div>
+            </div>
+            <div class="card" id="card-reviewer-loc">
+                <div class="card-header">
+                    <span class="card-title">Lines Modified</span>
+                    <span class="card-icon"></span>
+                </div>
+                <div class="card-value" id="val-reviewer-loc"></div>
+                <div class="card-detail" id="detail-reviewer-loc"></div>
+            </div>
+            <div class="card" id="card-reviewer-complexity">
+                <div class="card-header">
+                    <span class="card-title">Complex Files</span>
+                    <span class="card-icon"></span>
+                </div>
+                <div class="card-value" id="val-reviewer-complexity"></div>
+                <div class="card-detail" id="detail-reviewer-complexity"></div>
+            </div>
+        </div>
+        <div id="reviewer-zombie" class="warning-banner clear"></div>
+    </div>
+    <div id="reviewer-empty" class="warning-banner clear"></div>
+
+    <script nonce="{{nonce}}" src="{{scriptUri}}"></script>
+</body>
+</html>

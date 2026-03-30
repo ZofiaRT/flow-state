@@ -210,3 +210,26 @@ export async function getZombieCount(workspaceFolders: readonly vscode.Workspace
 
     return totalZombies;
 }
+
+/**
+ * Modified helper to get the actual names of zombie packages for the UI.
+ */
+export async function getZombieNames(workspaceFolders: readonly vscode.WorkspaceFolder[] | undefined): Promise<string[]> {
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+        return [];
+    }
+
+    let allZombies: string[] = [];
+
+    for (const folder of workspaceFolders) {
+        const rootPath = folder.uri.fsPath;
+        const packageJsonFiles = findPackageJsonFiles(rootPath);
+
+        for (const pkgPath of packageJsonFiles) {
+            const { zombies } = findZombiesInPackageJson(pkgPath);
+            allZombies.push(...zombies);
+        }
+    }
+
+    return allZombies;
+}

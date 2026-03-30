@@ -10,9 +10,20 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": ["onStartupFinished"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "todoListView",
+          "name": "To-Do List",
+          "icon": "$(checklist)"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "flow-state.checkZombiePackages",
@@ -21,10 +32,6 @@
       {
         "command": "flow-state.analyzePR",
         "title": "Flow-State: Analyze PR (Reviewer Load)"
-      },
-      {
-        "command": "flow-state.reviewInactiveTabs",
-        "title": "Flow-State: Review Inactive Tabs"
       }
     ],
     "walkthroughs": [
