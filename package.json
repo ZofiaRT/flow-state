@@ -41,6 +41,30 @@
       {
         "command": "todo-list.removeTask",
         "title": "Flow-State: Remove Task"
+      },
+      {
+        "command": "flow-state.openDashboard",
+        "title": "Flow-State: Open Dashboard"
+      },
+      {
+        "command": "flow-state.startPomodoro",
+        "title": "Flow-State: Start Pomodoro Timer"
+      },
+      {
+        "command": "flow-state.pausePomodoro",
+        "title": "Flow-State: Pause Pomodoro"
+      },
+      {
+        "command": "flow-state.resumePomodoro",
+        "title": "Flow-State: Resume Pomodoro"
+      },
+      {
+        "command": "flow-state.stopPomodoro",
+        "title": "Flow-State: Stop Pomodoro"
+      },
+      {
+        "command": "flow-state.reviewInactiveTabs",
+        "title": "Flow-State: Review Inactive Tabs"
       }
     ],
     "walkthroughs": [
@@ -214,17 +238,17 @@
             "default": 600000,
             "description": "Time window for counting context switches (ms)."
           },
-          "flowState.enableTabActivityTracker": {
+          "flow-state.enableInactiveTabWarnings": {
           "type": "boolean",
           "default": true,
           "description": "Enable or disable the tab activity tracker feature."
         },
-        "flowState.warningTabActivityInterval": {
+        "flow-state.warningTabActivityInterval": {
           "type": "number",
-          "default": 1800, 
+          "default": 1800000, 
           "description": "Time in ms between inactive tabs warnings."
         },
-        "flowState.tabActivityWarningThreshold": {
+        "flow-state.tabActivityWarningThreshold": {
           "type": "number",
           "default": 8,
           "description": "Number of inactive tabs before a warning is shown."
