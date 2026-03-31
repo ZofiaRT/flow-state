@@ -32,6 +32,15 @@
       {
         "command": "flow-state.analyzePR",
         "title": "Flow-State: Analyze PR (Reviewer Load)"
+      },
+      {
+        "command": "todo-list.addTask",
+        "title": "Flow-State: Add Task",
+        "icon": "$(add)"
+      },
+      {
+        "command": "todo-list.removeTask",
+        "title": "Flow-State: Remove Task"
       }
     ],
     "walkthroughs": [
