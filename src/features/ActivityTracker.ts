@@ -1,18 +1,15 @@
 import * as vscode from 'vscode';
 
 export class ActivityTracker {
-    // 1. Tab Switching Metric - TODO: Fill in!!
-    public totalTabSwitches: number = 0;
-
-    // 2. Add-Delete Metrics
+    // 1. Add-Delete Metrics
     public charactersAdded: number = 0;
     public charactersDeleted: number = 0;
 
-    // 3. Read-Write Metrics
+    // 2. Read-Write Metrics
     public lastWriteTime: number = Date.now();
     public isScrolling: boolean = false;
 
-    // 4. AI Usage
+    // 3. AI Usage
     public recentPastedCharacters: number = 0;
 
     constructor() {}
