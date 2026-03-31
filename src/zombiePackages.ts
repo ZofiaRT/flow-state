@@ -3,6 +3,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 const SOURCE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'];
+const IGNORED_PREFIXES = ['@types/', '@vscode/'];
+const IGNORED_PACKAGES = new Set([
+    'typescript', 'eslint', 'prettier', 'esbuild', 'webpack', 'rollup', 'vite',
+    'mocha', 'jest', 'vitest', 'npm-run-all', 'ts-node', 'nodemon', 'typescript-eslint'
+]);
 
 /**
  * Recursively find all files with the given extensions under a directory,
@@ -127,6 +132,16 @@ function findZombiesInPackageJson(packageJsonPath: string): ZombiePackagesResult
         return { packageJsonPath, zombies: [] };
     }
 
+    const depsToCheck = deps.filter(dep => {
+        const isIgnoredPrefix = IGNORED_PREFIXES.some(prefix => dep.startsWith(prefix));
+        const isIgnoredPackage = IGNORED_PACKAGES.has(dep);
+        return !isIgnoredPrefix && !isIgnoredPackage;
+    });
+
+    if (depsToCheck.length === 0) {
+        return { packageJsonPath, zombies: [] };
+    }
+
     // Collect all imports across source files
     const allImportedPackages = new Set<string>();
     for (const file of findSourceFiles(dir)) {
@@ -135,7 +150,7 @@ function findZombiesInPackageJson(packageJsonPath: string): ZombiePackagesResult
         }
     }
 
-    const zombies = deps.filter(dep => !allImportedPackages.has(dep));
+    const zombies = depsToCheck.filter(dep => !allImportedPackages.has(dep));
 
     return { packageJsonPath, zombies };
 }
