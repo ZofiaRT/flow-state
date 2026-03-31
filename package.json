@@ -221,6 +221,41 @@
           "description": "Number of inactive tabs before a warning is shown."
         }
         }
+      },
+      {
+        "title": "Flow-State: Pomodoro Timer",
+        "properties": {
+          "flow-state.enableSmartPomodoro": {
+            "order": 1,
+            "type": "boolean",
+            "default": true,
+            "description": "Enable dynamic adjustment of focus time based on cognitive load and code complexity."
+          },
+          "flow-state.pomodoroFocusTimeMinutes": {
+            "order": 2,
+            "type": "number",
+            "default": 25,
+            "description": "Duration of a focus session in minutes."
+          },
+          "flow-state.pomodoroBreakTimeMinutes": {
+            "order": 3,
+            "type": "number",
+            "default": 5,
+            "description": "Duration of a short break in minutes."
+          },
+          "flow-state.pomodoroLongBreakTimeMinutes": {
+            "order": 4,
+            "type": "number",
+            "default": 15,
+            "description": "Duration of a long break in minutes."
+          },
+          "flow-state.cycleCount": {
+            "order": 5,
+            "type": "number",
+            "default": 4,
+            "description": "Number of Pomodoro cycles before a long break."
+          }
+        }
       }
     ]
   },
