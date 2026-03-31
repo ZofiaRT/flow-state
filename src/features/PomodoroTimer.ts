@@ -36,6 +36,8 @@ export class PomodoroTimer implements vscode.Disposable {
     private INITIAL_COMPLEXITY_CHECK_DELAY = 60;
     private PERIODIC_CHECK_INTERVAL = 5 * 60;
 
+    private disposables: vscode.Disposable[] = [];
+
     private shortBreakSuggestions: string[] = [
         "☕ Get a coffee",
         "🚶 Go for a short walk",
@@ -83,11 +85,13 @@ export class PomodoroTimer implements vscode.Disposable {
         this.stopBar.hide();
 
         // Listen for configuration changes
-        vscode.workspace.onDidChangeConfiguration(e => {
-            if (e.affectsConfiguration('flow-state')) {
-                this.loadConfiguration();
-            }
-        });
+        this.disposables.push(
+            vscode.workspace.onDidChangeConfiguration(e => {
+                if (e.affectsConfiguration('flow-state')) {
+                    this.loadConfiguration();
+                }
+            })
+        );
     }
 
     /**
@@ -198,6 +202,7 @@ export class PomodoroTimer implements vscode.Disposable {
                         } else if (adjustment < 0) {
                             const reductionMinutes = (-adjustment / 60).toFixed(1);
                             vscode.window.showInformationMessage(`⚠️ High complexity. ${reductionMinutes}min adjusted for wellbeing`);
+                            this.timeRemaining += adjustment;
                         }
                         
                         lastRecordedMultiplier = multiplier;
@@ -272,5 +277,7 @@ export class PomodoroTimer implements vscode.Disposable {
         this.startBar.dispose();
         this.pauseBar.dispose();
         this.stopBar.dispose();
+        
+        this.disposables.forEach(d => d.dispose());
     }
 }
