@@ -3,8 +3,8 @@ import * as path from "path";
 
 import { StatusBar } from "../StatusBar";
 
-const CHECK_INTERVAL = 10000; // Check for inactive tabs every 1 min
-const TAB_INACTIVE_THRESHOLD = 10000; // A tab that is not touched for 30 minutes is inactive 30 * 60 * 1000
+const CHECK_INTERVAL = 60 * 1000; // Check for inactive tabs every 1 min
+const TAB_INACTIVE_THRESHOLD = 30 * 60 * 1000; // A tab that is not touched for 30 minutes is inactive 30 * 60 * 1000
 
 /**
  * Monitors all open text editor tabs and periodically warns
