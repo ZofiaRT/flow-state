@@ -55,7 +55,7 @@ export class Dashboard {
         const readWriteStatus = tracker.isReadWriteWarningActive ? 'warning' : 'good';
 
         const timeSinceWriteMs = activityTracker.getTimeSinceLastWriteMs();
-        const readWriteThresholdMs = config.get<number>('readWriteTimeThresholdSeconds', 120) * 1000;
+        const readWriteThresholdMs = config.get<number>('readWriteTimeThresholdSeconds', 900) * 1000;
 
         const complexityThreshold = config.get<number>('complexityThreshold', 15);
         const complexityScore = tracker.currentComplexityScore;
