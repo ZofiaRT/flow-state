@@ -2,6 +2,11 @@ import * as vscode from 'vscode';
 import { CognitiveLoadTracker } from './DeveloperCognitiveLoadTracker';
 
 export class PomodoroTimer implements vscode.Disposable {
+    /**
+     * A Pomodoro timer that integrates with the CognitiveLoadTracker to adjust focus session durations based on developer cognitive load.
+     * It provides start, pause, resume, and stop functionality, and displays status updates in the VS Code status bar.
+    */
+
     private focusDuration!: number;
     private currentFocusDuration: number = this.focusDuration;
     private shortBreakDuration!: number;
@@ -54,14 +59,23 @@ export class PomodoroTimer implements vscode.Disposable {
         "🛋 Relax and recharge"
     ];
     
+    /**
+     * Get a random suggestion for a break activity based on whether it's a long or short break.
+     * @param isLongBreak 
+     * @returns random suggestion string
+     */
     private getRandomSuggestion(isLongBreak: boolean): string {
-    const suggestions = isLongBreak 
-        ? this.longBreakSuggestions 
-        : this.shortBreakSuggestions;
+        const suggestions = isLongBreak 
+            ? this.longBreakSuggestions 
+            : this.shortBreakSuggestions;
 
-    return suggestions[Math.floor(Math.random() * suggestions.length)];
-}
+        return suggestions[Math.floor(Math.random() * suggestions.length)];
+    }
 
+    /**
+     * Initializes the Pomodoro timer with the provided cognitive load tracker.
+     * @param cognitiveLoadTracker 
+     */
     constructor(cognitiveLoadTracker: CognitiveLoadTracker) {
         this.cognitiveLoadTracker = cognitiveLoadTracker;
         
@@ -109,6 +123,12 @@ export class PomodoroTimer implements vscode.Disposable {
         this.currentFocusDuration = this.focusDuration;
     }
 
+    /**
+     * Calculates the adjusted focus duration based on the current cognitive load complexity score. 
+     * If the score is low, it may provide a bonus to focus time, and if it's high,
+     * it may reduce the focus time to encourage breaks.
+     * @returns object containing the adjusted duration, the adjustment amount, the multiplier applied, and the current complexity score
+     */
     private calculateAdjustedFocusDuration(): { adjustedDuration: number; adjustment: number; multiplier: number; complexityScore: number } {
         const complexityScore = this.cognitiveLoadTracker.currentComplexityScore;
         let multiplier = 1.0;
@@ -127,6 +147,9 @@ export class PomodoroTimer implements vscode.Disposable {
         return { adjustedDuration, adjustment, multiplier, complexityScore };
     }
 
+    /**
+     * Starts the Pomodoro timer.
+     */
     public async start(): Promise<void> {
         if (this.isRunning) {
             vscode.window.showWarningMessage("Pomodoro session already running!");
@@ -148,6 +171,9 @@ export class PomodoroTimer implements vscode.Disposable {
         this.startTimer();
     }
 
+    /**
+     * Pauses the Pomodoro timer.
+     */
     public pause(): void {
         if (this.timer) {
             clearInterval(this.timer);
@@ -158,6 +184,9 @@ export class PomodoroTimer implements vscode.Disposable {
         }
     }
 
+    /**
+     * Resumes the Pomodoro timer if it is currently paused.
+     */
     public resume(): void {
         if (!this.timer && this.isRunning) {
             vscode.window.showInformationMessage("▶ Pomodoro resumed");
@@ -167,6 +196,9 @@ export class PomodoroTimer implements vscode.Disposable {
         }
     }
 
+    /**
+     * Stops the Pomodoro timer and resets it.
+     */
     public stop(): void {
         if (this.timer) {
             clearInterval(this.timer);
@@ -179,6 +211,9 @@ export class PomodoroTimer implements vscode.Disposable {
         vscode.window.showInformationMessage("⏹ Pomodoro stopped");
     }
 
+    /**
+     * Starts the internal timer that counts down the focus or break session.
+     */
     private startTimer(): void {
         let elapsedSeconds = 0;
         let lastComplexityCheckTime = 0;
@@ -238,6 +273,9 @@ export class PomodoroTimer implements vscode.Disposable {
         }, 1000);
     }
 
+    /**
+     * Starts Focus Session
+     */
     private startFocus(): void {
         this.isFocusSession = true;
         this.currentFocusDuration = this.focusDuration;
@@ -247,6 +285,10 @@ export class PomodoroTimer implements vscode.Disposable {
         this.startTimer();
     }
 
+    /**
+     * Starts break session.
+     * @param longBreak boolean indicating whether to start a long break (true) or short break (false)
+     */
     private startBreak(longBreak: boolean): void {
         this.isFocusSession = false;
         this.timeRemaining = longBreak ? this.longBreakDuration : this.shortBreakDuration;
@@ -260,14 +302,6 @@ export class PomodoroTimer implements vscode.Disposable {
         );
 
         this.startTimer();
-    }
-
-    private validateNumber(value: string): string | null {
-        const n = Number(value);
-        if (isNaN(n) || n <= 0) {
-            return "Please enter a positive number";
-        }
-        return null;
     }
 
     dispose(): void {
