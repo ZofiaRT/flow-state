@@ -1,6 +1,10 @@
 import * as vscode from 'vscode';
 
 export class StatusBar {
+    /**
+     * Manages the status bar item that displays the developer's current flow state, including cognitive load warnings and reviewer load insights.
+     */
+
     public statusBarItem: vscode.StatusBarItem;
     private complexityScore: number = 0;
 
@@ -33,6 +37,9 @@ export class StatusBar {
     private statusBarTimeout: NodeJS.Timeout | null = null;
     private tooltipTimeout: NodeJS.Timeout | null = null;
 
+    /**
+     * Constructs the StatusBar and initializes the status bar item with default text and command. Also sets up the initial hover tooltip.
+     */
     constructor() {
         this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
         this.statusBarItem.text = "$(pulse) Flow State: Optimal";
@@ -48,17 +55,23 @@ export class StatusBar {
         this.statusBarItem.dispose();
     }
 
+    /**
+     * Updates the enabled/disabled state of the cognitive load tracking features and refreshes the hover tooltip to reflect the current configuration.
+     */
     public updateConfigState(master: boolean, complexity: boolean) {
         this.isMasterEnabled = master;
         this.isComplexityEnabled = complexity;
         this.updateHoverPopup();
     }
 
-    // Sets command for reviewing inactive tavs
+    // Sets command for reviewing inactive tabs
     public setCommand(command: string | undefined) {
         this.statusBarItem.command = command;
     }
 
+    /**
+     * Updates the reviewer related statistics. 
+     */
     public updateReviewerStats(enabled: boolean, fileCount: number, loc: number, complexFiles: number, zombies: string[], 
     complexFilesList: { name: string, score: number }[]) {
         this.isReviewerEnabled = enabled;
@@ -85,6 +98,9 @@ export class StatusBar {
         this.updateHoverPopup();
     }
 
+    /**
+     * Updates the Cognitive Complexity scores displayed on the tooltip.
+     */
     public updateComplexity(score: number) {
         this.complexityScore = score;
 
@@ -102,6 +118,10 @@ export class StatusBar {
         this.updateHoverPopup();
     }
 
+    /**
+     * Flashes a warning message on the status bar with a red background for 5 seconds, then reverts to the normal state.
+     * @param message 
+     */
     public flashStatusBar(message: string) {
         if (this.statusBarTimeout) { clearTimeout(this.statusBarTimeout); }
 
@@ -117,6 +137,10 @@ export class StatusBar {
         }, 5000);
     }
 
+    /**
+     * FLashes a success message on the status bar for 5 seconds, then reverts to the normal state.
+     * @param message 
+     */
     public flashSuccessBar(message: string) {
         if (this.statusBarTimeout) { clearTimeout(this.statusBarTimeout); }
 
@@ -133,6 +157,9 @@ export class StatusBar {
         }, 5000);
     }
 
+    /**
+     * Shows temporary warnings in the tooltip for 60 seconds.
+     */
     public showTemporaryWarning(message: string, type?: 'DELETION' | 'READING' | 'INSERTION') {
         this.flashStatusBar(message); 
 
@@ -148,6 +175,9 @@ export class StatusBar {
         }, 60000);
     }
 
+    /**
+     * Updates the hover tooltip with the latest cognitive load and reviewer insights, including any active warnings. 
+     */
     public updateHoverPopup() {
         const tooltip = new vscode.MarkdownString();
         tooltip.isTrusted = true;

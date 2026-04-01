@@ -7,9 +7,20 @@ import { StatusBar } from './StatusBar';
 import { ContextSwitchManager } from './features/contextSwitch';
 import { getNonce } from './utils';
 
-const REFRESH_INTERVAL_MS = 1000; // Refrehs interval for the dashboard metrics
+const REFRESH_INTERVAL_MS = 1000; // Refresh interval for the dashboard metrics
 
 export class Dashboard {
+    /**
+     * Implements a real-time dashboard as a VSCode Webview Panel to visualize various developer metrics related to flow state and cognitive load. The dashboard displays:
+     * - Current cognitive complexity score of the active file
+     * - Time since last write (to detect potential "stuckness")
+     * - Read/Write status (to detect heavy reading/tracing sessions)
+     * - Context switch score (to detect potential flow interruptions)
+     * - Reviewer load metrics (lines of code changed, complex files, zombie package warnings)
+     * 
+     * The dashboard updates in real-time as the developer works, providing actionable insights to help maintain flow state and manage cognitive load effectively.
+     */
+
     private static currentPanel: Dashboard | undefined;
     private readonly panel: vscode.WebviewPanel;
     private readonly disposables: vscode.Disposable[] = [];
@@ -23,6 +34,9 @@ export class Dashboard {
         this.updateInterval = setInterval(() => this.postData(tracker, activityTracker, statusBar, contextSwitchManager), REFRESH_INTERVAL_MS);
     }
 
+    /**
+     * Shows the dashboard panel.
+     */
     public static show(
         extensionUri: vscode.Uri,
         tracker: CognitiveLoadTracker,
@@ -49,6 +63,9 @@ export class Dashboard {
         Dashboard.currentPanel = new Dashboard(panel, extensionUri, tracker, activityTracker, statusBar, contextSwitchManager);
     }
 
+    /**
+     * Posts the latest metrics data to the webview for rendering.
+     */
     public postData(tracker: CognitiveLoadTracker, activityTracker: ActivityTracker, statusBar: StatusBar, contextSwitchManager: ContextSwitchManager) {
         const config = vscode.workspace.getConfiguration('flow-state');
 
@@ -89,6 +106,9 @@ export class Dashboard {
         });
     }
 
+    /**
+     * Builds the HTML content for the dashboard webview.
+     */
     private buildHtml(extensionUri: vscode.Uri): string {
         const webview = this.panel.webview;
         const mediaPath = vscode.Uri.joinPath(extensionUri, 'media');

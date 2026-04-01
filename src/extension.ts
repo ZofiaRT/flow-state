@@ -6,11 +6,13 @@ import { StatusBar } from './StatusBar';
 import { checkZombiePackages } from './zombiePackages';
 import { ActivityTracker } from './features/ActivityTracker';
 import { ReviewerTracker } from './features/ReviewerTracker';
-import * as path from 'path';
 import { Dashboard } from './Dashboard';
 import { ContextSwitchManager } from "./features/contextSwitch";
 import { InactiveTabsManager } from './features/inactiveTabs';
 
+/**
+ * Handles onboarding process for new users.
+ */
 function handleOnboarding(context: vscode.ExtensionContext) {
     const hasSeenOnboarding = context.globalState.get('flowState.hasSeenOnboarding');
     if (!hasSeenOnboarding) {
@@ -22,22 +24,22 @@ function handleOnboarding(context: vscode.ExtensionContext) {
     }
 }
 
+/**
+ * Activates the extension, initializing all features and registering commands and event listeners.
+ */
 export function activate(context: vscode.ExtensionContext) {
-    // Initialize TodoView first
     const todoView = new TodoView();
 
-    // Register the "Add Task" command
     let addTaskCommand = vscode.commands.registerCommand('todo-list.addTask', async () => {
         const taskName = await vscode.window.showInputBox({ prompt: 'Enter task name' });
         if (taskName) {
-            todoView.addTask(taskName);  // Add the task to the list
+            todoView.addTask(taskName); 
         }
     });
 
-    // Register the "Remove Task" command
     let removeTaskCommand = vscode.commands.registerCommand('todo-list.removeTask', async (taskName: string) => {
         if (taskName) {
-            todoView.removeTask(taskName);  // Remove the task from the list
+            todoView.removeTask(taskName);
         }
     });
 
