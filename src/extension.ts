@@ -3,12 +3,11 @@ import { TodoView } from './features/TodoView';
 import { CognitiveLoadTracker } from './features/DeveloperCognitiveLoadTracker';
 import { PomodoroTimer } from './features/PomodoroTimer';
 import { StatusBar } from './StatusBar';
-import { checkZombiePackages } from './zombiePackages';
 import { ActivityTracker } from './features/ActivityTracker';
 import { ReviewerTracker } from './features/ReviewerTracker';
-import { Dashboard } from './Dashboard';
 import { ContextSwitchManager } from "./features/contextSwitch";
 import { InactiveTabsManager } from './features/inactiveTabs';
+import { registerFlowStateCommands } from './commands';
 
 /**
  * Handles onboarding process for new users.
@@ -25,9 +24,9 @@ function handleOnboarding(context: vscode.ExtensionContext) {
 }
 
 /**
- * Activates the extension, initializing all features and registering commands and event listeners.
+ * Sets up the To-Do list feature.
  */
-export function activate(context: vscode.ExtensionContext) {
+function setupTodoView(context: vscode.ExtensionContext) {
     const todoView = new TodoView();
 
     let addTaskCommand = vscode.commands.registerCommand('todo-list.addTask', async () => {
@@ -43,9 +42,6 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    context.subscriptions.push(addTaskCommand, removeTaskCommand);
-
-    // Register the tree view in the sidebar
     const treeView = vscode.window.createTreeView('todoListView', {
         treeDataProvider: todoView,
         showCollapseAll: false,
@@ -59,115 +55,89 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }
     });
-    
+
+    context.subscriptions.push(addTaskCommand, removeTaskCommand, treeView);
+}
+
+/**
+ * Sets up Git integration to analyze PRs.
+ */
+function setupGitIntegration(reviewerTracker: ReviewerTracker) {
+    const gitExtension = vscode.extensions.getExtension('vscode.git');
+    if (gitExtension) {
+        gitExtension.activate().then(() => {
+            const gitApi = gitExtension.exports.getAPI(1);
+            const attachRepoListener = (repo: any) => {
+                repo.state.onDidChange(() => reviewerTracker.analyzePR());
+            };
+            gitApi.repositories.forEach(attachRepoListener);
+            gitApi.onDidOpenRepository(attachRepoListener);
+        });
+    }
+
+    reviewerTracker.analyzePR();
+}
+
+/**
+ * Sets up event listeners.
+ */
+function setupEventListeners(
+    context: vscode.ExtensionContext, 
+    activityTracker: ActivityTracker, 
+    cognitiveTracker: CognitiveLoadTracker
+) {
+    context.subscriptions.push(
+        vscode.window.onDidChangeActiveTextEditor(e => cognitiveTracker.onEditorChanged(e)),
+        vscode.workspace.onDidChangeTextDocument(e => {
+            activityTracker.onDocumentChanged(e);
+            cognitiveTracker.onDocumentChanged(e);
+        }),
+        vscode.window.onDidChangeTextEditorVisibleRanges(e => {
+            activityTracker.onScrolled(e);
+            cognitiveTracker.evaluateCognitiveLoad();
+        })
+    );
+}
+
+/**
+ * Activates the extension, initializing all features and registering commands and event listeners.
+ */
+export function activate(context: vscode.ExtensionContext) {    
     handleOnboarding(context);
+    setupTodoView(context);
 
     // Initialize core features
     const flowStateStatusBar = new StatusBar();
     const activityTracker = new ActivityTracker();
     const developerCognitiveLoadTracker = new CognitiveLoadTracker(flowStateStatusBar, activityTracker);
     const pomodoroTimer = new PomodoroTimer(developerCognitiveLoadTracker);
-
     const contextSwitchManager = new ContextSwitchManager(flowStateStatusBar);
-
-    // Registers command to statusbar for reviewing inactive tabs
     const inactiveTabsManager = new InactiveTabsManager(flowStateStatusBar);
-  
-    // Initialize the Reviewer Tracker
     const reviewerTracker = new ReviewerTracker(flowStateStatusBar);
-
-    // Register event listeners
-    const editorChangeDisposable = vscode.window.onDidChangeActiveTextEditor(e =>
-        developerCognitiveLoadTracker.onEditorChanged(e)
-    );
-
-    const documentChangeDisposable = vscode.workspace.onDidChangeTextDocument(e => {
-        activityTracker.onDocumentChanged(e);
-        developerCognitiveLoadTracker.onDocumentChanged(e);
-    });
-
-    const scrollDisposable = vscode.window.onDidChangeTextEditorVisibleRanges(e => {
-        activityTracker.onScrolled(e);
-        developerCognitiveLoadTracker.evaluateCognitiveLoad();
-    });
-
-    // Create output channel
     const outputChannel = vscode.window.createOutputChannel('Flow-State');
 
-    const zombieDisposable = vscode.commands.registerCommand('flow-state.checkZombiePackages', () => {
-        checkZombiePackages(outputChannel);
+
+    setupGitIntegration(reviewerTracker);
+    setupEventListeners(context, activityTracker, developerCognitiveLoadTracker);
+
+    registerFlowStateCommands(context, {
+        pomodoro: pomodoroTimer,
+        reviewerTracker: reviewerTracker,
+        inactiveTabs: inactiveTabsManager,
+        cognitiveTracker: developerCognitiveLoadTracker,
+        activityTracker: activityTracker,
+        statusBar: flowStateStatusBar,
+        contextSwitch: contextSwitchManager,
+        outputChannel: outputChannel
     });
 
-    const dashboardDisposable = vscode.commands.registerCommand('flow-state.openDashboard', () => {
-        Dashboard.show(context.extensionUri, developerCognitiveLoadTracker, activityTracker, flowStateStatusBar, contextSwitchManager);
-    });
-
-    // Register the Manual PR Check Command
-    const analyzePrDisposable = vscode.commands.registerCommand('flow-state.analyzePR', () => {
-        reviewerTracker.analyzePR();
-        vscode.window.showInformationMessage("Flow-State: Reviewer Cognitive Load Analyzed!");
-    });
-
-    // Listen for Git Staging changes automatically
-    const gitExtension = vscode.extensions.getExtension('vscode.git');
-    if (gitExtension) {
-        gitExtension.activate().then(() => {
-            const gitApi = gitExtension.exports.getAPI(1);
-
-            // Helper function to attach listener to a repository
-            const attachRepoListener = (repo: any) => {
-                repo.state.onDidChange(() => reviewerTracker.analyzePR());
-            };
-
-            // Attach to any repos already found
-            gitApi.repositories.forEach(attachRepoListener);
-
-            // Attach to any repos Git finds in the future (solves the startup bug!)
-            gitApi.onDidOpenRepository(attachRepoListener);
-        });
-    }
-
-    // Run it once on startup just in case files are already staged
-    reviewerTracker.analyzePR();
-
-    const startPomodoroDisposable = vscode.commands.registerCommand('flow-state.startPomodoro', () => {
-        pomodoroTimer.start();
-    });
-
-    const pausePomodoroDisposable = vscode.commands.registerCommand('flow-state.pausePomodoro', () => {
-        pomodoroTimer.pause();
-    });
-
-    const resumePomodoroDisposable = vscode.commands.registerCommand('flow-state.resumePomodoro', () => {
-        pomodoroTimer.resume();
-    });
-
-    const stopPomodoroDisposable = vscode.commands.registerCommand('flow-state.stopPomodoro', () => {
-        pomodoroTimer.stop();
-    });
-
-    const reviewTabsDisposable = vscode.commands.registerCommand( "flow-state.reviewInactiveTabs", () => {
-        inactiveTabsManager.showInactiveTabsPicker();
-    });
 
     context.subscriptions.push(
         flowStateStatusBar,
         pomodoroTimer,
         contextSwitchManager,
         outputChannel,
-        dashboardDisposable,
-        contextSwitchManager,
         inactiveTabsManager,
-        analyzePrDisposable,
-        editorChangeDisposable,
-        documentChangeDisposable,
-        scrollDisposable,
-        zombieDisposable,
-        startPomodoroDisposable,
-        pausePomodoroDisposable,
-        resumePomodoroDisposable,
-        stopPomodoroDisposable,
-        reviewTabsDisposable
     );
 }
 
