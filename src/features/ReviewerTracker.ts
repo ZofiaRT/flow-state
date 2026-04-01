@@ -9,8 +9,20 @@ import { getZombieNames } from '../zombiePackages';
 const exec = util.promisify(cp.exec);
 
 export class ReviewerTracker {
+    /**
+     * Tracks the "reviewer load" for a pull request by analyzing the staged changes in the git repository. It calculates:
+     * - Total lines of code changed (added + deleted)
+     * - Number of complex files (based on cognitive complexity)
+     * - Names of zombie packages (unused dependencies) for better suggestions
+     * 
+     * The results are sent to the StatusBar to provide feedback to the developer before they create a PR.
+     */
+
     private statusBar: StatusBar;
 
+    /**
+     * Constructs the ReviewerTracker with the provided status bar.
+     */
     constructor(statusBar: StatusBar) {
         this.statusBar = statusBar;
 
@@ -22,6 +34,9 @@ export class ReviewerTracker {
         });
     }
 
+    /**
+     * Analyzes the staged changes in the git repository to calculate reviewer load metrics and updates the status bar with the results.
+     */
     public async analyzePR() {
         const config = vscode.workspace.getConfiguration('flow-state');
         const isEnabled = config.get<boolean>('enableReviewerLoadTracking', true);

@@ -6,6 +6,14 @@ class Task {
 }
 
 export class TodoView implements vscode.TreeDataProvider<Task> {
+    /**
+     * Implements a To-Do list view using VSCode's TreeView API. It allows users to add and remove tasks, and displays them in a hierarchical tree structure.
+     * The view includes:
+     * - An "Add Task" button at the top to quickly add new tasks.
+     * - Each task can be checked off (using a checkbox) to indicate completion.
+     * - Tasks can be removed from the list.
+     */
+
     private tasks: Task[] = []; // Store tasks in this array
 
     // Initialize with sample tasks if needed
@@ -28,7 +36,6 @@ export class TodoView implements vscode.TreeDataProvider<Task> {
         } else {
             item.contextValue = 'task';
 
-            // ✅ Add checkbox
             item.checkboxState = vscode.TreeItemCheckboxState.Unchecked;
 
         }
@@ -40,13 +47,17 @@ export class TodoView implements vscode.TreeDataProvider<Task> {
         return Promise.resolve(this.tasks);  // Return all tasks
     }
 
-    // Add a new task
+    /**
+     * Adds a new task with the specified label to the list and updates the TreeView.
+     */
     addTask(label: string) {
         this.tasks.push(new Task(label));  // Add task to the list
         this._onDidChangeTreeData.fire(undefined);  // Trigger update to TreeView
     }
 
-    // Remove a task
+    /**
+     * Removes a task with the specified label from the list and updates the TreeView.
+     */
     removeTask(label: string) {
         this.tasks = this.tasks.filter(task => task.label !== label);  // Filter out the task to remove
         this._onDidChangeTreeData.fire(undefined);  // Trigger update to TreeView
