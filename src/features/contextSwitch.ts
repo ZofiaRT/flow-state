@@ -23,6 +23,7 @@ export class ContextSwitchManager implements vscode.Disposable {
   private lastFolderPath?: string;
 
   private listener: vscode.Disposable;
+  private configListener: vscode.Disposable;
 
   private isShowingWarning = false;
 
@@ -50,7 +51,7 @@ export class ContextSwitchManager implements vscode.Disposable {
       this.handleEditorChange(editor),
     );
 
-    vscode.workspace.onDidChangeConfiguration((e) => {
+    this.configListener = vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration("flow-state.contextSwitch")) {
         this.updateConfig();
       }
@@ -143,5 +144,6 @@ export class ContextSwitchManager implements vscode.Disposable {
 
   dispose() {
     this.listener.dispose();
+    this.configListener.dispose();
   }
 }
