@@ -24,7 +24,10 @@ export class InactiveTabsManager implements vscode.Disposable {
   private warningInterval: number;
   private tabWarningThreshold: number;
   
-
+  /**
+   * Initializes the inactive tabs manager with the provided status bar.
+   * @param statusBar 
+   */
   constructor(statusBar: StatusBar) {
     const config = vscode.workspace.getConfiguration("flow-state");
 
@@ -56,6 +59,11 @@ export class InactiveTabsManager implements vscode.Disposable {
     this.interval = setInterval(() => this.checkInactiveTabs(), CHECK_INTERVAL);
   }
 
+  /**
+   * Seeds the initial state of the tab activity tracker by marking all currently open text editor tabs as active.
+   * This ensures that the manager has a baseline for tracking inactivity from the moment it is initialized,
+   * rather than treating all existing tabs as inactive until they are interacted with.
+   */
   private seedTabs() {
     for (const group of vscode.window.tabGroups.all) {
       for (const tab of group.tabs) {
@@ -66,10 +74,18 @@ export class InactiveTabsManager implements vscode.Disposable {
     }
   }
 
+  /**
+   * Marks a tab as active by updating its last-active timestamp to the current time. This method is called whenever a tab is interacted with.
+   * @param uri 
+   */
   private markActive(uri: string) {
     this.tabLastActive.set(uri, Date.now());
   }
 
+  /**
+   * Retrieves all tabs that have been inactive for longer than the threshold.
+   * @returns 
+   */
   private getInactiveTabs(): vscode.Tab[] {
     const now = Date.now();
 
@@ -83,6 +99,11 @@ export class InactiveTabsManager implements vscode.Disposable {
       });
   }
 
+  /**
+   * Checks for inactive tabs and shows a warning if the number of inactive tabs exceeds the configured threshold.
+   * This method is called periodically by a background interval.
+   * @returns 
+   */
   private checkInactiveTabs() {
     if (!this.isEnabled) {
       return;
@@ -115,6 +136,10 @@ export class InactiveTabsManager implements vscode.Disposable {
     this.statusBar.setCommand("flow-state.reviewInactiveTabs");
   }
 
+  /**
+   * Shows a quick pick menu to allow the user to select and close inactive tabs.
+   * @returns 
+   */
   public async showInactiveTabsPicker() {
     const inactiveTabs = this.getInactiveTabs();
 

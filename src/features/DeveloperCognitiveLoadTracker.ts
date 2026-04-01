@@ -4,12 +4,26 @@ import { ActivityTracker } from './ActivityTracker';
 import { calculateCognitiveComplexity } from '../utils/complexityCalculator';
 
 export class CognitiveLoadTracker {
+    /**
+     * Tracks various metrics to evaluate developer cognitive load and updates the status bar with warnings and complexity scores.
+     * Metrics include:
+     * - Code Complexity (using cognitive complexity)
+     * - Add/Delete Ratio (to detect potential "stuckness")
+     * - Read/Write Ratio (to detect heavy reading/tracing sessions)
+     * - Large Insertions (to detect potential (AI-assisted) code insertions)
+     */
+
     public currentComplexityScore = 0;
     public isReadWriteWarningActive = false;
     private previousComplexityScore = 0;
     private statusBar: StatusBar;
     private activityTracker: ActivityTracker;
 
+    /**
+     * Initializes the cognitive load tracker with the provided status bar and activity tracker.
+     * @param statusBar  
+     * @param activityTracker 
+     */
     constructor(statusBar: StatusBar, activityTracker: ActivityTracker) {
         this.statusBar = statusBar;
         this.activityTracker = activityTracker;
@@ -23,10 +37,18 @@ export class CognitiveLoadTracker {
         this.evaluateCognitiveLoad();
     }
 
+    /**
+     * Handles changes to the active text editor. Evaluates cognitive load when the user switches editors.
+     * @param editor 
+     */
     public onEditorChanged(editor: vscode.TextEditor | undefined) {
         this.evaluateCognitiveLoad();
     }
 
+    /**
+     * Handles changes to the active text document. Evaluates cognitive load when the user types or makes edits.
+     * @param event 
+     */
     public onDocumentChanged(event: vscode.TextDocumentChangeEvent) {
         const activeEditor = vscode.window.activeTextEditor;
         if (activeEditor && event.document === activeEditor.document) {
@@ -34,6 +56,9 @@ export class CognitiveLoadTracker {
         }
     }
 
+    /**
+     * Evaluates the developer's cognitive load based on various metrics. Updates the status bar with warnings and complexity scores accordingly.
+     */
     public evaluateCognitiveLoad() {
         const config = vscode.workspace.getConfiguration('flow-state');
 

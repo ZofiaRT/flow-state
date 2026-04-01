@@ -1,6 +1,14 @@
 import * as vscode from 'vscode';
 
 export class ActivityTracker {
+    /**
+     * Tracks user activity in the editor, including:
+     * - Characters added/deleted
+     * - Time since last write
+     * - Scrolling activity
+     * - Potential AI-assisted code generation (inferred from large pastes)
+     */
+
     // 1. Add-Delete Metrics
     public charactersAdded: number = 0;
     public charactersDeleted: number = 0;
@@ -14,6 +22,10 @@ export class ActivityTracker {
 
     constructor() {}
 
+    /**
+     * Handles changes to the active text document.
+     * @param event  
+     */
     public onDocumentChanged(event: vscode.TextDocumentChangeEvent) {
         this.lastWriteTime = Date.now();
         this.isScrolling = false;
@@ -30,10 +42,18 @@ export class ActivityTracker {
         }
     }
 
+    /**
+     * Handles scrolling events in the text editor.
+     * @param event 
+     */
     public onScrolled(event: vscode.TextEditorVisibleRangesChangeEvent) {
         this.isScrolling = true;
     }
 
+    /**
+     * Calculates the ratio of characters added to characters deleted.
+     * @returns ratio or Infinity if only additions, or 0 if no changes
+     */
     public getAddDeleteRatio(): number {
         if (this.charactersDeleted === 0) {
             return this.charactersAdded > 0 ? Infinity : 0;
@@ -41,6 +61,10 @@ export class ActivityTracker {
         return this.charactersAdded / this.charactersDeleted;
     }
 
+    /**
+     * Gets the time elapsed since the last write operation.
+     * @returns time in milliseconds
+     */
     public getTimeSinceLastWriteMs(): number {
         return Date.now() - this.lastWriteTime;
     }

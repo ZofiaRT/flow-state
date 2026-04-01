@@ -6,7 +6,6 @@ import { StatusBar } from "../StatusBar";
 const WINDOW_DURATION = 10 * 60 * 1000; 
 const SWITCH_THRESHOLD = 8; 
 
-//const SNOOZE_DURATION = 5 * 60 * 1000;
 const DISMISS_COOLDOWN = 1 * 60 * 1000;
 
 const FILE_SWITCH_WEIGHT = 1;
@@ -33,16 +32,28 @@ export class ContextSwitchManager implements vscode.Disposable {
   private switchThreshold: number = SWITCH_THRESHOLD;
   private windowDuration: number = WINDOW_DURATION;
 
+  /**
+   * Calculates the current context switch score based on recent events within the sliding window.
+   * @returns current score
+   */
   public get currentScore(): number {
     const now = Date.now();
     const recent = this.switchEvents.filter(e => now - e.time < this.windowDuration);
     return recent.reduce((sum, e) => sum + e.weight, 0);
   }
 
+  /**
+   * Gets the threshold for triggering a context switch warning.
+   * @returns threshold
+   */
   public get threshold(): number {
     return this.switchThreshold;
   }
 
+  /**
+   * Initializes the context switch manager with the provided status bar.
+   * @param statusBar 
+   */
   constructor(statusBar: StatusBar) {
     this.statusBar = statusBar;
     this.updateConfig();
@@ -58,6 +69,11 @@ export class ContextSwitchManager implements vscode.Disposable {
     });
   }
 
+  /**
+   * Updates the configuration settings for the context switch manager, including enabling/disabling the feature,
+   * adjusting the switch threshold, and setting the duration of the sliding window. This method is called when
+   * the relevant configuration changes.
+   */
   private updateConfig() {
     const config = vscode.workspace.getConfiguration(
       "flow-state.contextSwitch",
@@ -66,6 +82,13 @@ export class ContextSwitchManager implements vscode.Disposable {
     this.switchThreshold = config.get<number>("switchThreshold", 8);
     this.windowDuration = config.get<number>("windowDuration", 10 * 60 * 1000);
   }
+
+  /**
+   * Handles changes to the active text editor. Detects when the user switches files or folders and records context switch events accordingly.
+   * If the accumulated switch score exceeds the threshold, a warning is triggered.
+   * @param editor 
+   * @returns 
+   */
   private handleEditorChange(editor: vscode.TextEditor | undefined) {
     if (!editor) {
       return;
@@ -95,6 +118,10 @@ export class ContextSwitchManager implements vscode.Disposable {
     this.lastFolderPath = folderPath;
   }
 
+  /**
+   * Records a context switch event with the given weight. It adds the event to the list of recent events and calculates the current switch score.
+   * @param weight 
+   */
   private async recordSwitch(weight: number) {
     if (!this.isEnabled) {
       return;
@@ -121,6 +148,10 @@ export class ContextSwitchManager implements vscode.Disposable {
     }
   }
   
+  /**
+   * Displays a warning in the status bar when frequent context switching is detected. This method sets a cooldown period during which no new warnings will be shown,
+   * even if the user continues to switch contexts frequently. The warning encourages the user to focus on one task to reduce cognitive load.
+   */
   private async showWarning() {
     this.isShowingWarning = true;
 
