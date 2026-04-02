@@ -30,7 +30,7 @@ export class StatusBar {
             fileCount: this.reviewerFileCount,
             loc: this.reviewerLoc,
             complexFiles: this.reviewerComplexityFiles,
-            hasZombieWarning: this.hasZombieWarning,
+            hasZombieWarning: this.zombieNames.length > 0,
         };
     }
     

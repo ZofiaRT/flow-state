@@ -81,9 +81,9 @@ function render(data) {
         if (reviewer.hasZombieWarning) {
             zombieBanner.textContent = '⚠ Potential zombie packages detected in package.json';
             zombieBanner.className = 'warning-banner';
+            zombieBanner.style.display = '';
         } else {
-            zombieBanner.textContent = '';
-            zombieBanner.className = 'warning-banner clear';
+            zombieBanner.style.display = 'none';
         }
     }
 

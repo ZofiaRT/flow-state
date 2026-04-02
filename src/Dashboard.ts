@@ -31,6 +31,7 @@ export class Dashboard {
         this.panel.webview.html = this.buildHtml(extensionUri);
         this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
+        this.postData(tracker, activityTracker, statusBar, contextSwitchManager);
         this.updateInterval = setInterval(() => this.postData(tracker, activityTracker, statusBar, contextSwitchManager), REFRESH_INTERVAL_MS);
     }
 
