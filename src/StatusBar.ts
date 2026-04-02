@@ -188,47 +188,45 @@ export class StatusBar {
 
         tooltip.appendMarkdown(`### Flow-State Session\n\n---\n\n`);
 
-        if (!this.isMasterEnabled) {
-            tooltip.appendMarkdown(`*Cognitive Load Tracking is currently disabled in settings.*`);
-            this.statusBarItem.tooltip = tooltip;
-            return;
-        }
-
         // Main Cognitive Load Section
         tooltip.appendMarkdown(`### Cognitive Load\n\n`);
 
-        const currentWarning = this.activeTooltipWarning; 
-        const hasComplexityWarning = this.isComplexityEnabled && this.complexityScore > complexityThreshold;
-
-        tooltip.appendMarkdown(`#### Active Alerts\n\n`);
-        
-        if (currentWarning || hasComplexityWarning) {
-            if (currentWarning) {
-                let suggestion = "";
-                // Use the Message Type logic to provide non-brittle suggestions
-                switch (this.activeWarningType) {
-                    case 'DELETION':
-                        suggestion = "\n\n> **Suggestion:** 🚶‍♂️ Taking a quick walk can work wonders when you're feeling stuck!";
-                        break;
-                    case 'READING':
-                        suggestion = "\n\n> **Suggestion:** 🧠 Tracing code is tiring! Give your eyes a rest or try sketching the logic on paper.";
-                        break;
-                    case 'INSERTION':
-                        suggestion = "\n\n> **Suggestion:** ⏸️ Pasting lots of code? Take a quick breather to review it line-by-line before moving on.";
-                        break;
-                }
-                tooltip.appendMarkdown(`* **${currentWarning}**${suggestion}\n\n`);
-            }
-            if (hasComplexityWarning) {
-                tooltip.appendMarkdown(`* **High Code Complexity (Score: ${this.complexityScore})**\n\n`);
-            }
+        if (!this.isMasterEnabled) {
+            tooltip.appendMarkdown(`*Cognitive Load Tracking is currently disabled in settings.*\n\n`);
         } else {
-            tooltip.appendMarkdown(`* $(check) Optimal\n\n`);
-        }
+            const currentWarning = this.activeTooltipWarning; 
+            const hasComplexityWarning = this.isComplexityEnabled && this.complexityScore > complexityThreshold;
 
-        if (this.isComplexityEnabled) {
-            tooltip.appendMarkdown(`#### Code Complexity\n\n`);
-            tooltip.appendMarkdown(`* Current File Score: **${this.complexityScore}** *(Threshold: ${complexityThreshold})*\n\n`);
+            tooltip.appendMarkdown(`#### Active Alerts\n\n`);
+            
+            if (currentWarning || hasComplexityWarning) {
+                if (currentWarning) {
+                    let suggestion = "";
+                    // Use the Message Type logic to provide non-brittle suggestions
+                    switch (this.activeWarningType) {
+                        case 'DELETION':
+                            suggestion = "\n\n> **Suggestion:** 🚶‍♂️ Taking a quick walk can work wonders when you're feeling stuck!";
+                            break;
+                        case 'READING':
+                            suggestion = "\n\n> **Suggestion:** 🧠 Tracing code is tiring! Give your eyes a rest or try sketching the logic on paper.";
+                            break;
+                        case 'INSERTION':
+                            suggestion = "\n\n> **Suggestion:** ⏸️ Pasting lots of code? Take a quick breather to review it line-by-line before moving on.";
+                            break;
+                    }
+                    tooltip.appendMarkdown(`* **${currentWarning}**${suggestion}\n\n`);
+                }
+                if (hasComplexityWarning) {
+                    tooltip.appendMarkdown(`* **High Code Complexity (Score: ${this.complexityScore})**\n\n`);
+                }
+            } else {
+                tooltip.appendMarkdown(`* $(check) Optimal\n\n`);
+            }
+
+            if (this.isComplexityEnabled) {
+                tooltip.appendMarkdown(`#### Code Complexity\n\n`);
+                tooltip.appendMarkdown(`* Current File Score: **${this.complexityScore}** *(Threshold: ${complexityThreshold})*\n\n`);
+            }
         }
 
         // Reviewer Cognitive Load Section
