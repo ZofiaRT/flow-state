@@ -84,10 +84,11 @@ export class ReviewerTracker {
                 // Skip binary files which show up as "-"
                 if (addedStr === '-' || deletedStr === '-') { continue; }
 
+                totalFiles++;
+
                 // Skip .json and .lock files from LOC and complexity
                 if (filePath.endsWith('.json') || filePath.endsWith('.lock')) { continue; }
 
-                totalFiles++;
                 totalLoc += parseInt(addedStr, 10) + parseInt(deletedStr, 10);
 
                 // Check Cognitive Complexity
